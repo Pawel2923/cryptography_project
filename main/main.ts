@@ -1,6 +1,10 @@
 import { app, BrowserWindow } from "electron";
 import serve from "electron-serve";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const appServe = app.isPackaged
     ? serve({
