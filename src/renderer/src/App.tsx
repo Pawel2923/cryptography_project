@@ -1,18 +1,12 @@
-import { Link, Route, Routes } from 'react-router'
+import { Route, Routes } from 'react-router'
+import HomePage from './pages/home'
+import DecryptPage from './pages/decrypt'
 
 function App(): React.JSX.Element {
   return (
     <Routes>
-      <Route
-        path="/"
-        element={
-          <div>
-            <p>Hello World</p>
-            <Link to="/about">About</Link>
-          </div>
-        }
-      />
-      <Route path="/about" element={<p>About Us</p>} />
+      <Route path="/" element={<HomePage />} />
+      <Route path="/decrypt" element={<DecryptPage />} />
     </Routes>
   )
 }
