@@ -5,7 +5,7 @@ import { TypographyLabel } from '../ui/typography'
 
 export default function FileContainer(): React.ReactNode {
   return (
-    <DataInputContainer to="/file">
+    <DataInputContainer containerType="text">
       <Type size={64} aria-hidden="true" />
       <TypographyLabel>Wpisz lub wklej tekst</TypographyLabel>
     </DataInputContainer>

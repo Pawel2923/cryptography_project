@@ -5,7 +5,7 @@ import { TypographyLabel } from '../ui/typography'
 
 export default function FileContainer(): React.ReactNode {
   return (
-    <DataInputContainer to="/file">
+    <DataInputContainer containerType="file">
       <FileUp size={64} aria-hidden="true" />
       <TypographyLabel>Wybierz plik z dysku</TypographyLabel>
     </DataInputContainer>
