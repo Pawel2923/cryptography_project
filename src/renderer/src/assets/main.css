@@ -5,7 +5,13 @@ body {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background-image: url('./wavy-lines.svg');
-  background-size: cover;
   user-select: none;
+}
+
+.active {
+  color: var(--accent);
+}
+
+.active:hover {
+  color: var(--color-text-accent-hover);
 }
