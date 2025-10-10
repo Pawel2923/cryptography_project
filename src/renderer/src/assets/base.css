@@ -55,6 +55,9 @@
   --font-size-label: 16px;
   --font-size-body: 16px;
   --font-size-small: 14px;
+
+  /* Custom shadows */
+  --shadow-hovered: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 :root {
@@ -119,7 +122,7 @@
   --sidebar-ring: #26a69a;
 }
 
-.dark {
+.dark :root:not(.light) {
   /* Dark theme colors mapped to shadcn/ui variables */
   --background: #212122;
   --foreground: #e8e8e8;
@@ -168,6 +171,57 @@
   --sidebar-ring: #26a69a;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    /* Dark theme colors mapped to shadcn/ui variables */
+    --background: #212122;
+    --foreground: #e8e8e8;
+    --card: #2c2c2d;
+    --card-foreground: #e8e8e8;
+    --popover: #2c2c2d;
+    --popover-foreground: #e8e8e8;
+    --primary: #26a69a;
+    --primary-foreground: #212122;
+    --secondary: #2c2c2d;
+    --secondary-foreground: #e8e8e8;
+    --muted: #2c2c2d;
+    --muted-foreground: #a7a7a7;
+    --accent: #26a69a;
+    --accent-foreground: #212122;
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+    --border: #606060;
+    --input: #606060;
+    --ring: #26a69a;
+
+    /* Custom text colors for dark theme */
+    --text-primary: #e8e8e8;
+    --text-primary-hover: #ffffff;
+    --text-secondary: #a7a7a7;
+    --text-disabled: #7a7a7a;
+    --text-subtle: #d3d3d3;
+    --text-accent-hover: #33b5a8;
+    --text-primary-color-hover: #33b5a8;
+
+    /* Chart colors for dark theme */
+    --chart-1: #26a69a;
+    --chart-2: #4fc3f7;
+    --chart-3: #ffb74d;
+    --chart-4: #81c784;
+    --chart-5: #f06292;
+
+    /* Sidebar colors for dark theme */
+    --sidebar: #2c2c2d;
+    --sidebar-foreground: #e8e8e8;
+    --sidebar-primary: #26a69a;
+    --sidebar-primary-foreground: #212122;
+    --sidebar-accent: #2c2c2d;
+    --sidebar-accent-foreground: #e8e8e8;
+    --sidebar-border: #606060;
+    --sidebar-ring: #26a69a;
+  }
+}
+
 @layer utilities {
   /* Typography utilities */
   .text-header-size {
@@ -205,8 +259,8 @@
     background-color: color-mix(in srgb, var(--accent) 90%, transparent);
   }
 
-  .border-accent {
-    border-color: var(--accent);
+  .border-primary {
+    border-color: var(--border);
   }
 
   .ring-accent {
@@ -225,18 +279,6 @@
     background-color: var(--background);
     color: var(--foreground);
   }
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  font-weight: normal;
-}
-
-ul {
-  list-style: none;
 }
 
 body {

@@ -2,10 +2,15 @@
 
 body {
   display: flex;
-  align-items: center;
-  justify-content: center;
   overflow: hidden;
   user-select: none;
+}
+
+#root {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .active {
