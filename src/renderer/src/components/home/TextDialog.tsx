@@ -24,8 +24,11 @@ import { ClipboardPaste, Trash } from 'lucide-react'
 import { Label } from '@renderer/components/ui/label'
 import { useClipboard } from '@renderer/hooks/useClipboard'
 import { useTextForm } from '@renderer/hooks/useTextForm'
+import { useLocation, useNavigate } from 'react-router'
 
 export default function TextDialog(): React.ReactNode {
+  const navigate = useNavigate()
+  const location = useLocation()
   const { readLastCopiedText } = useClipboard()
   const { textValue, errors, hasErrors, handleTextChange, handlePaste, handleReset, handleSubmit } =
     useTextForm({ minLength: 3, required: true })
@@ -42,6 +45,7 @@ export default function TextDialog(): React.ReactNode {
       const data = new FormData(event.target as HTMLFormElement)
       console.log('Submitted text:', data.get('text'))
       //TODO: Handle successful submission
+      navigate(`${location.pathname}/algorithms`)
     }
   }
 

@@ -2,15 +2,14 @@ import React, { useId } from 'react'
 import { FileUp } from 'lucide-react'
 import { TypographyLabel } from '../ui/typography'
 import { FILE_CONTAINER_CLASSES } from './constants'
-import { useNavigate } from 'react-router'
-import { HomePageProps } from '@renderer/pages/home'
+import { useLocation, useNavigate } from 'react-router'
 
 export default function FileContainer({
-  activePage,
   ...rest
-}: HomePageProps & React.HTMLAttributes<HTMLDivElement>): React.ReactNode {
+}: React.HTMLAttributes<HTMLDivElement>): React.ReactNode {
   const labelId = useId()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const changeHandler = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const files = event.target.files
@@ -22,7 +21,7 @@ export default function FileContainer({
     console.log('Selected file:', file)
 
     //TODO: Handle file upload
-    navigate(`/${activePage || ''}}`)
+    navigate(`${location.pathname}/algorithms`)
   }
 
   return (

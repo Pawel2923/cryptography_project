@@ -8,7 +8,7 @@ export default function Header(): React.ReactNode {
   return (
     <header className="flex gap-2 py-6 justify-center items-center w-full">
       <TypographyH1>
-        <NavLink to="/" className={navLinkClasses}>
+        <NavLink to="/encrypt" className={navLinkClasses}>
           Szyfrowanie
         </NavLink>{' '}
         <span className="text-text-subtle">/</span>{' '}
