@@ -3,7 +3,7 @@ import Header from '@renderer/components/Header'
 import FileContainer from '@renderer/components/home/FileContainer'
 import TextDialog from '@renderer/components/home/TextDialog'
 
-interface HomePageProps {
+export interface HomePageProps {
   activePage?: 'encrypt' | 'decrypt'
 }
 
@@ -14,7 +14,7 @@ export default function HomePage({ activePage }: HomePageProps): React.ReactNode
     <>
       <Header />
       <div className="flex gap-4 justify-center items-center">
-        <FileContainer />
+        <FileContainer activePage={activePage} />
         <TextDialog />
       </div>
     </>
