@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import {
   Dialog,
   DialogClose,
@@ -23,78 +23,27 @@ import { Button } from '@renderer/components/ui/button'
 import { ClipboardPaste, Trash } from 'lucide-react'
 import { Label } from '@renderer/components/ui/label'
 import { useClipboard } from '@renderer/hooks/useClipboard'
+import { useTextForm } from '@renderer/hooks/useTextForm'
 
 export default function TextDialog(): React.ReactNode {
   const { readLastCopiedText } = useClipboard()
-  const [textareaValue, setTextareaValue] = useState('')
-  const [errors, setErrors] = useState<string[]>([])
+  const { textValue, errors, hasErrors, handleTextChange, handlePaste, handleReset, handleSubmit } =
+    useTextForm({ minLength: 3, required: true })
 
   const pasteBtnClickHandler = async (): Promise<void> => {
     const text = await readLastCopiedText()
-    if (text) {
-      setTextareaValue(text)
-      if (errors.length > 0 && text.length >= 3) {
-        setErrors([])
-      }
-    } else {
-      setErrors(['Nie udało się odczytać zawartości schowka'])
-    }
-  }
-
-  const textareaChangeHandler = (event: React.ChangeEvent<HTMLTextAreaElement>): void => {
-    setTextareaValue(event.target.value)
-
-    if (errors.length > 0 && event.target.value.length >= 3) {
-      setErrors([])
-    }
-  }
-
-  const validateText = (text: string): string[] => {
-    const validationErrors: string[] = []
-
-    if (!text || text.trim().length === 0) {
-      validationErrors.push('To pole jest wymagane')
-    } else if (text.length < 3) {
-      validationErrors.push('Tekst musi mieć co najmniej 3 znaki')
-    }
-
-    return validationErrors
+    handlePaste(text)
   }
 
   const submitHandler = (event: React.FormEvent): void => {
-    event.preventDefault()
+    const isValid = handleSubmit(event)
 
-    const form = event.target as HTMLFormElement
-    if (!form.checkValidity()) {
-      const textInput = form.elements.namedItem('text') as HTMLTextAreaElement
-
-      if (textInput.validity.valueMissing) {
-        setErrors(['To pole jest wymagane'])
-      } else if (textInput.validity.tooShort) {
-        setErrors(['Tekst musi mieć co najmniej 3 znaki'])
-      } else {
-        setErrors(['Wprowadzone dane są nieprawidłowe'])
-      }
-      return
+    if (isValid) {
+      const data = new FormData(event.target as HTMLFormElement)
+      console.log('Submitted text:', data.get('text'))
+      //TODO: Handle successful submission
     }
-
-    const validationErrors = validateText(textareaValue)
-    if (validationErrors.length > 0) {
-      setErrors(validationErrors)
-      return
-    }
-
-    setErrors([])
-    const data = new FormData(event.target as HTMLFormElement)
-    console.log('Submitted text:', data.get('text'))
   }
-
-  const resetHandler = (): void => {
-    setTextareaValue('')
-    setErrors([])
-  }
-
-  const hasErrors = errors.length > 0
 
   return (
     <Dialog>
@@ -105,7 +54,7 @@ export default function TextDialog(): React.ReactNode {
         <DialogHeader>
           <DialogTitle>Przetwarzanie tekstu</DialogTitle>
         </DialogHeader>
-        <form onSubmit={submitHandler} onReset={resetHandler} className="grid gap-6">
+        <form onSubmit={submitHandler} onReset={handleReset} className="grid gap-6">
           <FieldSet>
             <FieldGroup>
               <Field>
@@ -137,8 +86,8 @@ export default function TextDialog(): React.ReactNode {
                   name="text"
                   required
                   minLength={3}
-                  value={textareaValue}
-                  onChange={textareaChangeHandler}
+                  value={textValue}
+                  onChange={handleTextChange}
                   aria-invalid={hasErrors}
                 />
                 <DialogDescription asChild>
@@ -157,7 +106,7 @@ export default function TextDialog(): React.ReactNode {
             <DialogClose asChild>
               <Button variant="outline">Anuluj</Button>
             </DialogClose>
-            <Button type="submit" disabled={hasErrors && textareaValue.length > 0}>
+            <Button type="submit" disabled={hasErrors && textValue.length > 0}>
               Potwierdź
             </Button>
           </DialogFooter>
