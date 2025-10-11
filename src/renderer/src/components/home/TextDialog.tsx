@@ -45,8 +45,14 @@ export default function TextDialog(): React.ReactNode {
     }
   }
 
+  const onDialogOpenChange = (open: boolean): void => {
+    if (!open) {
+      handleReset()
+    }
+  }
+
   return (
-    <Dialog>
+    <Dialog onOpenChange={onDialogOpenChange}>
       <DialogTrigger asChild>
         <TextContainer />
       </DialogTrigger>
