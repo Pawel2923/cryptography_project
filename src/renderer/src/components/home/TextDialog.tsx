@@ -22,20 +22,22 @@ import { DialogDescription } from '@radix-ui/react-dialog'
 import { Button } from '@renderer/components/ui/button'
 import { ClipboardPaste, Trash } from 'lucide-react'
 import { Label } from '@renderer/components/ui/label'
+import { useClipboard } from '@renderer/hooks/useClipboard'
 
 export default function TextDialog(): React.ReactNode {
+  const { readLastCopiedText } = useClipboard()
   const [textareaValue, setTextareaValue] = useState('')
   const [errors, setErrors] = useState<string[]>([])
 
   const pasteBtnClickHandler = async (): Promise<void> => {
-    try {
-      setTextareaValue(await navigator.clipboard.readText())
-      if (errors.length > 0) {
+    const text = await readLastCopiedText()
+    if (text) {
+      setTextareaValue(text)
+      if (errors.length > 0 && text.length >= 3) {
         setErrors([])
       }
-    } catch (error) {
-      console.error('Failed to read clipboard contents: ', error)
-      setErrors(['Nie można odczytać zawartości schowka'])
+    } else {
+      setErrors(['Nie udało się odczytać zawartości schowka'])
     }
   }
 
