@@ -1,25 +1,30 @@
 import React from 'react'
 import { TypographyLabel } from '../ui/typography'
-import { Button } from '../ui/button'
 import { LockKeyhole } from 'lucide-react'
 import { CONTAINER_BASE_CLASSES } from '../constants'
+import { Link } from 'react-router'
 
-type AlgorithmContainerProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+type AlgorithmContainerProps = React.ComponentPropsWithoutRef<typeof Link> & {
   children: React.ReactNode
+  to: string
   icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>
+  description?: string
 }
 
 export default function AlgorithmContainer({
   children,
+  to,
   icon,
+  description,
   ...rest
 }: AlgorithmContainerProps): React.ReactNode {
   const IconComponent = icon || LockKeyhole
 
   return (
-    <Button className={CONTAINER_BASE_CLASSES} variant="none" {...rest}>
+    <Link to={to} className={CONTAINER_BASE_CLASSES} {...rest}>
       <IconComponent size={64} aria-hidden="true" />
       <TypographyLabel>{children}</TypographyLabel>
-    </Button>
+      <TypographyLabel>{description}</TypographyLabel>
+    </Link>
   )
 }

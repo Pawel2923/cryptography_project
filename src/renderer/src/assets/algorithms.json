@@ -1,0 +1,8 @@
+[
+  {
+    "id": "caesar-cipher",
+    "name": "Szyfr Cezara",
+    "description": "Prosty szyfr podstawieniowy, który przesuwa każdą literę o stałą liczbę miejsc w alfabecie.",
+    "iconName": "text-wrap"
+  }
+]
