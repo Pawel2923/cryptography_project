@@ -20,6 +20,30 @@
     "build:mac": "electron-vite build && electron-builder --mac",
     "build:linux": "electron-vite build && electron-builder --linux"
   },
+  "build": {
+    "appId": "com.cryptography_project.app",
+    "productName": "Szyfrowanie i deszyfrowanie",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "out/**",
+      "rust_crypto/**",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "build/icon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "build/icon.png"
+    }
+  },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
@@ -37,6 +61,7 @@
     "tailwindcss": "^4.1.14"
   },
   "devDependencies": {
+    "@electron-forge/cli": "^7.10.2",
     "@electron-toolkit/eslint-config-prettier": "^3.0.0",
     "@electron-toolkit/eslint-config-ts": "^3.1.0",
     "@electron-toolkit/tsconfig": "^2.0.0",
