@@ -1,0 +1,14 @@
+{
+  "name": "rust_crypto",
+  "version": "1.0.0",
+  "description": "Algorithms written in Rust for cryptography_project",
+  "license": "ISC",
+  "author": "Pawel2923",
+  "type": "module",
+  "scripts": {
+    "build": "napi build --release"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^3.0.0"
+  }
+}

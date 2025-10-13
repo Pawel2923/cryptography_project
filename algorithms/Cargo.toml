@@ -3,4 +3,9 @@ name = "algorithms"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+crate-type = ["cdylib"]
+
 [dependencies]
+napi = { version = "3", features = ["napi6"] }
+napi-derive = "3"
