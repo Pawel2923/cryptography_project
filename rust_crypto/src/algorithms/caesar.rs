@@ -1,10 +1,12 @@
-pub fn encrypt(text: &str, key: u8) -> String {
-    text.chars().map(|c| caesar_shift(c, key as i8)).collect()
+pub fn encrypt(text: &str, key: &str) -> String {
+    text.chars()
+        .map(|c| caesar_shift(c, key.parse::<i8>().unwrap_or(0)))
+        .collect()
 }
 
-pub fn decrypt(text: &str, key: u8) -> String {
+pub fn decrypt(text: &str, key: &str) -> String {
     text.chars()
-        .map(|c| caesar_shift(c, -(key as i8)))
+        .map(|c| caesar_shift(c, -(key.parse::<i8>().unwrap_or(0))))
         .collect()
 }
 
