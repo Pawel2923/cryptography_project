@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useId } from 'react'
 import {
   Dialog,
   DialogClose,
@@ -29,6 +29,7 @@ import { useLocation, useNavigate } from 'react-router'
 export default function TextDialog(): React.ReactNode {
   const navigate = useNavigate()
   const location = useLocation()
+  const filenameId = useId()
   const { readLastCopiedText } = useClipboard()
   const { textValue, errors, hasErrors, handleTextChange, handlePaste, handleReset, handleSubmit } =
     useTextForm({ minLength: 3, required: true })
@@ -40,13 +41,18 @@ export default function TextDialog(): React.ReactNode {
 
   const submitHandler = (event: React.FormEvent): void => {
     const isValid = handleSubmit(event)
-
-    if (isValid) {
-      const data = new FormData(event.target as HTMLFormElement)
-      console.log('Submitted text:', data.get('text'))
-      //TODO: Handle successful submission
-      navigate(`${location.pathname}/algorithms`)
+    if (!isValid) {
+      return
     }
+
+    const data = new FormData(event.target as HTMLFormElement)
+    const text = data.get('text') as string
+    console.log('Submitted text:', text)
+
+    const buffer = new TextEncoder().encode(text)
+    window.api.file.store(`text-${filenameId}.txt`, buffer)
+
+    navigate(`${location.pathname}/algorithms`)
   }
 
   const onDialogOpenChange = (open: boolean): void => {
