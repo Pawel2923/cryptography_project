@@ -19,7 +19,7 @@ export default function AlgorithmsPage({
       </Header>
       <Main layout="grid" className="grid-cols-3">
         {algorithms.map((alg) => (
-          <AlgorithmContainer to={`${operation}/algorithm/${alg.id}`} key={alg.id} icon={alg.icon}>
+          <AlgorithmContainer to={`/${operation}/algorithm/${alg.id}`} key={alg.id} icon={alg.icon}>
             {alg.name}
           </AlgorithmContainer>
         ))}

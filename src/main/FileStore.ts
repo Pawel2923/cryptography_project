@@ -6,6 +6,7 @@ export type FileData = {
 
 export type ProcessOptions = {
   key: string
+  algorithm: string
 }
 
 class FileStore {

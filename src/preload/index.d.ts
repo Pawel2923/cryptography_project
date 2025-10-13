@@ -20,7 +20,7 @@ declare global {
         }>
         process: (
           operation: 'encrypt' | 'decrypt',
-          options: object
+          options: ProcessOptions
         ) => Promise<{
           success: boolean
           filePath?: string
