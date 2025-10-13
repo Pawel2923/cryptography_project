@@ -1,13 +1,27 @@
-pub fn encrypt(text: &str, key: &str) -> String {
-    text.chars()
-        .map(|c| caesar_shift(c, key.parse::<i8>().unwrap_or(0)))
-        .collect()
+use crate::utils::file_handler;
+
+pub fn encrypt(file_path: &str, key: &str) -> Result<String, std::io::Error> {
+    let text = file_handler::read_file(file_path)?;
+    let key_num = key
+        .parse::<i8>()
+        .map_err(|_| std::io::Error::new(std::io::ErrorKind::InvalidInput, "Invalid key format"))?;
+
+    let encrypted: String = text.chars().map(|c| caesar_shift(c, key_num)).collect();
+
+    file_handler::write_file(file_path, encrypted.as_str())?;
+    Ok(encrypted)
 }
 
-pub fn decrypt(text: &str, key: &str) -> String {
-    text.chars()
-        .map(|c| caesar_shift(c, -(key.parse::<i8>().unwrap_or(0))))
-        .collect()
+pub fn decrypt(file_path: &str, key: &str) -> Result<String, std::io::Error> {
+    let text = file_handler::read_file(file_path)?;
+    let key_num = key
+        .parse::<i8>()
+        .map_err(|_| std::io::Error::new(std::io::ErrorKind::InvalidInput, "Invalid key format"))?;
+
+    let decrypted: String = text.chars().map(|c| caesar_shift(c, -key_num)).collect();
+
+    file_handler::write_file(file_path, decrypted.as_str())?;
+    Ok(decrypted)
 }
 
 pub fn caesar_shift(c: char, key: i8) -> char {
