@@ -8,8 +8,9 @@ pub fn encrypt(file_path: &str, key: &str) -> Result<String, std::io::Error> {
 
     let encrypted: String = text.chars().map(|c| caesar_shift(c, key_num)).collect();
 
-    file_handler::write_file(file_path, encrypted.as_str())?;
-    Ok(encrypted)
+    let encrypted_path_str = file_handler::create_output_path_with_suffix(file_path, "_encrypted");
+    file_handler::write_file(&encrypted_path_str, encrypted.as_str())?;
+    Ok(encrypted_path_str)
 }
 
 pub fn decrypt(file_path: &str, key: &str) -> Result<String, std::io::Error> {
@@ -20,8 +21,9 @@ pub fn decrypt(file_path: &str, key: &str) -> Result<String, std::io::Error> {
 
     let decrypted: String = text.chars().map(|c| caesar_shift(c, -key_num)).collect();
 
-    file_handler::write_file(file_path, decrypted.as_str())?;
-    Ok(decrypted)
+    let decrypted_path_str = file_handler::create_output_path_with_suffix(file_path, "_decrypted");
+    file_handler::write_file(&decrypted_path_str, decrypted.as_str())?;
+    Ok(decrypted_path_str)
 }
 
 pub fn caesar_shift(c: char, key: i8) -> char {
