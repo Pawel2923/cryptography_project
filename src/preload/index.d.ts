@@ -27,6 +27,8 @@ declare global {
           error?: string
         }>
         clear: () => Promise<{ success: boolean }>
+        download: (filePath?: string) => Promise<{ success: boolean; error?: string }>
+        preview: (filePath?: string) => Promise<{ success: boolean; error?: string }>
       }
     }
   }

@@ -21,28 +21,28 @@ export function setupFileHandlers(app: Electron.App): void {
   ipcMain.handle(
     'file:store',
     async (_event, filename: string, buffer: Uint8Array): Promise<FileHandlerReturnType> => {
-    try {
+      try {
         const filePath = path.join(app.getPath('temp'), filename)
         await fs.writeFile(filePath, buffer)
 
-      const stats = await fs.stat(filePath)
+        const stats = await fs.stat(filePath)
 
         const fileData = {
-        path: filePath,
-        name: filePath.split(/[/\\]/).pop() || 'unknown',
+          path: filePath,
+          name: filePath.split(/[/\\]/).pop() || 'unknown',
           size: stats.size
-      }
+        }
 
-      fileStore.setFileData(fileData)
+        fileStore.setFileData(fileData)
 
-      return {
-        success: true,
+        return {
+          success: true,
           FileData: { path: fileData.path, name: fileData.name, size: fileData.size }
+        }
+      } catch (error) {
+        console.error('Error storing file:', error)
+        return { success: false, error: 'Failed to store file' }
       }
-    } catch (error) {
-      console.error('Error storing file:', error)
-      return { success: false, error: 'Failed to store file' }
-    }
     }
   )
 
@@ -135,4 +135,75 @@ export function setupFileHandlers(app: Electron.App): void {
     fileStore.clearFileData()
     return { success: true }
   })
+
+  ipcMain.handle(
+    'file:download',
+    async (_event, filePath?: string): Promise<{ success: boolean; error?: string }> => {
+      try {
+        let targetPath = filePath
+        if (!targetPath) {
+          const fileData = fileStore.getFileData()
+          console.log('file:download - fileData from store:', fileData)
+          if (!fileData) {
+            return { success: false, error: 'No file available for download' }
+          }
+          targetPath = fileData.path
+        }
+
+        console.log('file:download - attempting to read file:', targetPath)
+        const data = await fs.readFile(targetPath)
+        console.log('file:download - file read successfully, size:', data.length)
+
+        const { dialog } = require('electron')
+        const { canceled, filePath: savePath } = await dialog.showSaveDialog({
+          defaultPath: path.basename(targetPath)
+        })
+
+        if (canceled || !savePath) {
+          return { success: false, error: 'Save operation was cancelled' }
+        }
+
+        await fs.writeFile(savePath, data)
+        console.log('file:download - file saved successfully to:', savePath)
+        return { success: true }
+      } catch (error) {
+        console.error('Error downloading file:', error)
+        return { success: false, error: 'Failed to download file' }
+      }
+    }
+  )
+
+  ipcMain.handle(
+    'file:preview',
+    async (_event, filePath?: string): Promise<{ success: boolean; error?: string }> => {
+      try {
+        let targetPath = filePath
+        if (!targetPath) {
+          const fileData = fileStore.getFileData()
+          console.log('file:preview - fileData from store:', fileData)
+          if (!fileData) {
+            return { success: false, error: 'No file available for preview' }
+          }
+          targetPath = fileData.path
+        }
+
+        console.log('file:preview - attempting to read file:', targetPath)
+        const data = await fs.readFile(targetPath)
+        console.log('file:preview - file read successfully, size:', data.length)
+
+        const { shell } = require('electron')
+        const tempPreviewPath = path.join(
+          app.getPath('temp'),
+          `preview_${path.basename(targetPath)}`
+        )
+        await fs.writeFile(tempPreviewPath, data)
+        console.log('file:preview - preview file created:', tempPreviewPath)
+        await shell.openPath(tempPreviewPath)
+        return { success: true }
+      } catch (error) {
+        console.error('Error previewing file:', error)
+        return { success: false, error: 'Failed to preview file' }
+      }
+    }
+  )
 }

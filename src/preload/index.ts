@@ -10,7 +10,9 @@ const api = {
     getInfo: () => ipcRenderer.invoke('file:getInfo'),
     process: (operation: 'encrypt' | 'decrypt', options: ProcessOptions) =>
       ipcRenderer.invoke('file:process', operation, options),
-    clear: () => ipcRenderer.invoke('file:clear')
+    clear: () => ipcRenderer.invoke('file:clear'),
+    download: (filePath?: string) => ipcRenderer.invoke('file:download', filePath),
+    preview: (filePath?: string) => ipcRenderer.invoke('file:preview', filePath)
   }
 }
 
