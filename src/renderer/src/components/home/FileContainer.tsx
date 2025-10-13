@@ -11,16 +11,17 @@ export default function FileContainer({
   const navigate = useNavigate()
   const location = useLocation()
 
-  const changeHandler = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const files = event.target.files
-    if (!files || files.length === 0) {
+  const changeHandler = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+    const file = event.target.files?.[0]
+    if (!file) {
       return
     }
 
-    const file = files[0]
-    console.log('Selected file:', file)
+    const arrayBuffer = await file.arrayBuffer()
+    const uint8Array = new Uint8Array(arrayBuffer)
 
-    //TODO: Handle file upload
+    await window.api.file.store(file.name, uint8Array)
+
     navigate(`${location.pathname}/algorithms`)
   }
 

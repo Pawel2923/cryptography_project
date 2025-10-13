@@ -2,8 +2,11 @@ export type FileData = {
   path: string
   name: string
   size: number
-  buffer?: Buffer
 } | null
+
+export type ProcessOptions = {
+  key: string
+}
 
 class FileStore {
   private fileData: FileData = null

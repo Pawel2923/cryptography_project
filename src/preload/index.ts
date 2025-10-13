@@ -1,12 +1,14 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import { ProcessOptions } from 'src/main/FileStore'
 
 // Custom APIs for renderer
 const api = {
   file: {
-    store: (filePath: string) => ipcRenderer.invoke('file:store', filePath),
+    store: (filename: string, buffer: Uint8Array) =>
+      ipcRenderer.invoke('file:store', filename, buffer),
     getInfo: () => ipcRenderer.invoke('file:getInfo'),
-    process: (operation: 'encrypt' | 'decrypt', options: object) =>
+    process: (operation: 'encrypt' | 'decrypt', options: ProcessOptions) =>
       ipcRenderer.invoke('file:process', operation, options),
     clear: () => ipcRenderer.invoke('file:clear')
   }
