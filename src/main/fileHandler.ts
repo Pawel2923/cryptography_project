@@ -6,8 +6,8 @@ import path from 'path'
 
 const require = createRequire(import.meta.url)
 const rustCrypto = require('../../rust_crypto/index.node') as {
-  encrypt: (filepath: string, key: string) => string
-  decrypt: (filePath: string, key: string) => string
+  encrypt: (filepath: string, key: string, algorithm: string) => string
+  decrypt: (filePath: string, key: string, algorithm: string) => string
 }
 const { encrypt, decrypt } = rustCrypto
 
@@ -88,10 +88,10 @@ export function setupFileHandlers(app: Electron.App): void {
 
         switch (operation) {
           case 'encrypt':
-            result = encrypt(fileData.path, options.key)
+            result = encrypt(fileData.path, options.key, options.algorithm)
             break
           case 'decrypt':
-            result = decrypt(fileData.path, options.key)
+            result = decrypt(fileData.path, options.key, options.algorithm)
             break
           default:
             console.error('Invalid operation:', operation)

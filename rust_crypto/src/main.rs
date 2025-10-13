@@ -1,21 +1,25 @@
+mod adapter;
 mod algorithms;
-use algorithms::caesar;
-
+mod traits;
 mod utils;
-use utils::file_handler;
+use adapter::AlgorithmAdapter;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let text = file_handler::read_file("./src/example.txt")?;
+    let text = utils::file_handler::read_file("./src/example.txt")?;
     println!("Read text: {}", text);
 
-    let encryption_result = caesar::encrypt("./src/example.txt", "3")?;
+    let encryption_result = AlgorithmAdapter::encrypt(
+        "./src/example.txt".to_string(),
+        "3".to_string(),
+        "caesar-cipher".to_string(),
+    )?;
     println!("Encrypted: {}", encryption_result);
 
-    let decryption_result = caesar::decrypt("./src/example.txt", "3")?;
+    let decryption_result = AlgorithmAdapter::decrypt(
+        "./src/example_encrypted.txt".to_string(),
+        "3".to_string(),
+        "caesar-cipher".to_string(),
+    )?;
     println!("Decrypted: {}", decryption_result);
-
-    file_handler::write_file("./src/encrypted.txt", &encryption_result)?;
-    println!("Encrypted text saved to ./src/encrypted.txt");
-
     Ok(())
 }
