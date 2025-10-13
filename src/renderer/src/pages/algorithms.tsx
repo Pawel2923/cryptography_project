@@ -1,4 +1,5 @@
 import AlgorithmContainer from '@renderer/components/algorithms/AlgorithmContainer'
+import { BackButton } from '@renderer/components/BackButton'
 import Header from '@renderer/components/Header'
 import Main from '@renderer/components/Main'
 import { TypographyH1 } from '@renderer/components/ui/typography'
@@ -14,6 +15,7 @@ export default function AlgorithmsPage({
 }): React.ReactNode {
   return (
     <>
+      <BackButton />
       <Header>
         <TypographyH1>Wybierz algorytm</TypographyH1>
       </Header>

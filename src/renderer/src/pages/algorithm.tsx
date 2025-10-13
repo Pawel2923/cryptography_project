@@ -1,4 +1,5 @@
 import CaesarCipher from '@renderer/components/algorithm/CaesarCipher'
+import { BackButton } from '@renderer/components/BackButton'
 import Header from '@renderer/components/Header'
 import Main from '@renderer/components/Main'
 import { Button } from '@renderer/components/ui/button'
@@ -63,6 +64,7 @@ export default function AlgorithmPage({
 
   return (
     <>
+      <BackButton />
       <Header>
         <TypographyH1>
           {algorithm.name} - {operation === 'encrypt' ? 'Szyfrowanie' : 'Deszyfrowanie'}
