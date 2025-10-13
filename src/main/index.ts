@@ -1,8 +1,17 @@
 import { app, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
 import { setupFileHandlers } from './fileHandler'
+
+function getIcon(): string {
+  if (process.platform === 'win32') {
+    return join(__dirname, '../../build/icon.ico')
+  } else if (process.platform === 'darwin') {
+    return join(__dirname, '../../build/icon.icns')
+  } else {
+    return join(__dirname, '../../build/icon.png')
+  }
+}
 
 function createWindow(): void {
   // Create the browser window.
@@ -10,7 +19,7 @@ function createWindow(): void {
     width: 900,
     height: 670,
     show: false,
-    ...(process.platform === 'linux' ? { icon } : {}),
+    icon: getIcon(),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
