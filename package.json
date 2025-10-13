@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "An Electron application with React and TypeScript",
   "main": "./out/main/index.js",
-  "author": "Pawel2923",
+  "author": "Paweł Poremba",
   "homepage": "https://github.com/Pawel2923/cryptography_project",
   "repository": {
     "type": "git",

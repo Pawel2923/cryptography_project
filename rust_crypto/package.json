@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Algorithms written in Rust for cryptography_project",
   "license": "MIT",
-  "author": "Pawel2923",
+  "author": "Paweł Poremba",
   "type": "module",
   "types": "index.d.ts",
   "main": "index.js",
