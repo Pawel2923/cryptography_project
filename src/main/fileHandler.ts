@@ -78,6 +78,7 @@ export function setupFileHandlers(app: Electron.App): void {
         !fileData ||
         !fileData.path ||
         !options.key ||
+        !options.algorithm ||
         (await fs.stat(fileData.path).catch(() => false)) === false
       ) {
         return { success: false, error: 'No file to process' }

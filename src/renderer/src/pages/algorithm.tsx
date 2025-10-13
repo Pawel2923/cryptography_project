@@ -29,7 +29,7 @@ export default function AlgorithmPage({
   const runAlgorithm = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault()
 
-    if (!isValid) {
+    if (!isValid || !algorithm.id || !key) {
       console.error('Invalid options')
       return
     }
@@ -39,7 +39,7 @@ export default function AlgorithmPage({
 
       const result = await window.api.file.process(operation, {
         key,
-        algorithm: event.currentTarget.id
+        algorithm: algorithm.id
       })
       if (result.success) {
         console.log('Algorithm result:', result.filePath)
@@ -71,7 +71,7 @@ export default function AlgorithmPage({
       <Main className="flex-col md:max-w-3/4 mx-auto text-center">
         <form onSubmit={runAlgorithm} className="grid gap-6">
           {algorithmComponent}
-          <Button type="submit" id={algorithm.id} disabled={!isValid}>
+          <Button type="submit" disabled={!isValid}>
             Uruchom
           </Button>
         </form>
