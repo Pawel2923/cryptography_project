@@ -4,6 +4,7 @@ import Header from '@renderer/components/Header'
 import Main from '@renderer/components/Main'
 import { Button } from '@renderer/components/ui/button'
 import { TypographyH1 } from '@renderer/components/ui/typography'
+import { useTitle } from '@renderer/hooks/useTitle'
 import { getAlgorithm } from '@renderer/lib/algorithm-util'
 import React, { useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
@@ -23,6 +24,13 @@ export default function AlgorithmPage({
   )
 
   const algorithm = getAlgorithm(id || '')
+
+  useTitle(
+    operation === 'encrypt'
+      ? `${algorithm?.name ? `${algorithm.name} - ` : ''}Szyfrowanie`
+      : `${algorithm?.name ? `${algorithm.name} - ` : ''}Deszyfrowanie`
+  )
+
   if (!algorithm) {
     return algorithmNotImplemented
   }

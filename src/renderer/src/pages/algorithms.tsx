@@ -3,6 +3,7 @@ import { BackButton } from '@renderer/components/BackButton'
 import Header from '@renderer/components/Header'
 import Main from '@renderer/components/Main'
 import { TypographyH1 } from '@renderer/components/ui/typography'
+import { useTitle } from '@renderer/hooks/useTitle'
 import { getAlgorithms } from '@renderer/lib/algorithm-util'
 import React from 'react'
 
@@ -13,6 +14,8 @@ export default function AlgorithmsPage({
 }: {
   operation: 'encrypt' | 'decrypt'
 }): React.ReactNode {
+  useTitle(`Wybierz algorytm - ${operation === 'encrypt' ? 'Szyfrowanie' : 'Deszyfrowanie'}`)
+
   return (
     <>
       <BackButton />

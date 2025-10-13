@@ -2,10 +2,12 @@ import Header from '@renderer/components/Header'
 import Main from '@renderer/components/Main'
 import { Button } from '@renderer/components/ui/button'
 import { TypographyH1 } from '@renderer/components/ui/typography'
+import { useTitle } from '@renderer/hooks/useTitle'
 import { ArrowDownToLine, ExternalLink } from 'lucide-react'
 import { useNavigate } from 'react-router'
 
 export default function ResultPage(): React.ReactNode {
+  useTitle('Wynik operacji')
   const navigate = useNavigate()
 
   const downloadResult = async (): Promise<void> => {
