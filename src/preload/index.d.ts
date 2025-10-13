@@ -5,14 +5,17 @@ declare global {
     electron: ElectronAPI
     api: {
       file: {
-        store: (filePath: string) => Promise<{
+        store: (
+          filename: string,
+          buffer: Uint8Array
+        ) => Promise<{
           success: boolean
-          fileInfo?: { name: string; size: number; path: string }
+          FileData?: { name: string; size: number; path: string }
           error?: string
         }>
         getInfo: () => Promise<{
           success: boolean
-          fileInfo?: { name: string; size: number; path: string }
+          FileData?: { name: string; size: number; path: string }
           error?: string
         }>
         process: (
@@ -20,8 +23,7 @@ declare global {
           options: object
         ) => Promise<{
           success: boolean
-          result?: Buffer
-          originalName?: string
+          filePath?: string
           error?: string
         }>
         clear: () => Promise<{ success: boolean }>

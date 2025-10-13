@@ -49,7 +49,7 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  setupFileHandlers()
+  setupFileHandlers(app)
 
   createWindow()
 

@@ -1,44 +1,55 @@
 import { ipcMain } from 'electron'
 import fs from 'fs/promises'
-import { FileData, fileStore } from './FileStore'
+import { FileData, fileStore, ProcessOptions } from './FileStore'
+import { createRequire } from 'module'
+import path from 'path'
 
-type FileInfo = Omit<NonNullable<FileData>, 'buffer'>
+const require = createRequire(import.meta.url)
+const rustCrypto = require('../../rust_crypto/index.node') as {
+  encrypt: (filepath: string, key: string) => string
+  decrypt: (filePath: string, key: string) => string
+}
+const { encrypt, decrypt } = rustCrypto
 
 type FileHandlerReturnType =
-  | { success: true; fileInfo: FileInfo }
+  | { success: true; FileData: FileData }
   | { success: false; error: string }
 
-type FileProcessReturnType =
-  | { success: true; result: Buffer; originalName: string }
-  | { success: false; error: string }
+type FileProcessReturnType = { success: true; filePath: string } | { success: false; error: string }
 
-export function setupFileHandlers(): void {
-  ipcMain.handle('file:store', async (_event, filePath: string): Promise<FileHandlerReturnType> => {
+export function setupFileHandlers(app: Electron.App): void {
+  ipcMain.handle(
+    'file:store',
+    async (_event, filename: string, buffer: Uint8Array): Promise<FileHandlerReturnType> => {
     try {
-      const stats = await fs.stat(filePath)
-      const buffer = await fs.readFile(filePath)
+        const filePath = path.join(app.getPath('temp'), filename)
+        await fs.writeFile(filePath, buffer)
 
-      const fileData: NonNullable<FileData> = {
+      const stats = await fs.stat(filePath)
+
+        const fileData = {
         path: filePath,
         name: filePath.split(/[/\\]/).pop() || 'unknown',
-        size: stats.size,
-        buffer
+          size: stats.size
       }
 
       fileStore.setFileData(fileData)
 
       return {
         success: true,
-        fileInfo: { path: fileData.path, name: fileData.name, size: fileData.size }
+          FileData: { path: fileData.path, name: fileData.name, size: fileData.size }
       }
     } catch (error) {
       console.error('Error storing file:', error)
       return { success: false, error: 'Failed to store file' }
     }
-  })
+    }
+  )
 
   ipcMain.handle('file:getInfo', (): FileHandlerReturnType => {
     const fileData = fileStore.getFileData()
+
+    console.log('file:getInfo called, current fileData:', fileData)
 
     if (!fileData) {
       return { success: false, error: 'No file stored' }
@@ -46,7 +57,7 @@ export function setupFileHandlers(): void {
 
     return {
       success: true,
-      fileInfo: {
+      FileData: {
         name: fileData.name,
         size: fileData.size,
         path: fileData.path
@@ -59,28 +70,51 @@ export function setupFileHandlers(): void {
     async (
       _event,
       operation: 'encrypt' | 'decrypt',
-      options: object
+      options: ProcessOptions
     ): Promise<FileProcessReturnType> => {
       const fileData = fileStore.getFileData()
 
-      if (!fileData || !fileData.buffer) {
+      if (
+        !fileData ||
+        !fileData.path ||
+        !options.key ||
+        (await fs.stat(fileData.path).catch(() => false)) === false
+      ) {
         return { success: false, error: 'No file to process' }
       }
 
       try {
-        //TODO: Integrate with native module
+        let result: string = ''
 
-        console.log(`Processing file: ${fileData.name} with operation: ${operation}`)
-        console.log('Options:', options)
-
-        //TODO: Replace with actual processing result
-        const processedBuffer = fileData.buffer
-
-        return {
-          success: true,
-          result: processedBuffer,
-          originalName: fileData.name
+        switch (operation) {
+          case 'encrypt':
+            result = encrypt(fileData.path, options.key)
+            break
+          case 'decrypt':
+            result = decrypt(fileData.path, options.key)
+            break
+          default:
+            console.error('Invalid operation:', operation)
+            return { success: false, error: 'Invalid operation' }
         }
+
+        const processedStats = await fs.stat(result)
+
+        const oldFilePath = fileData.path
+        fileStore.setFileData({
+          name: path.basename(result),
+          path: result,
+          size: processedStats.size
+        })
+
+        try {
+          await fs.unlink(oldFilePath)
+        } catch (error) {
+          console.warn('Warning: Could not delete original file:', error)
+        }
+
+        console.log('Processed file created:', result)
+        return { success: true, filePath: result }
       } catch (error) {
         console.error('Error processing file:', error)
         return { success: false, error: 'Processing failed' }
@@ -88,7 +122,16 @@ export function setupFileHandlers(): void {
     }
   )
 
-  ipcMain.handle('file:clear', () => {
+  ipcMain.handle('file:clear', async () => {
+    const fileData = fileStore.getFileData()
+    if (fileData) {
+      try {
+        await fs.unlink(fileData.path)
+      } catch (err) {
+        console.error('Error deleting file:', err)
+      }
+    }
+
     fileStore.clearFileData()
     return { success: true }
   })
