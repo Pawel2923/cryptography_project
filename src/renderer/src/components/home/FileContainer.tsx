@@ -1,7 +1,7 @@
 import React, { useId } from 'react'
 import { FileUp } from 'lucide-react'
 import { TypographyLabel } from '../ui/typography'
-import { FILE_CONTAINER_CLASSES } from './constants'
+import { FILE_CONTAINER_CLASSES } from '../constants'
 import { useLocation, useNavigate } from 'react-router'
 
 export default function FileContainer({

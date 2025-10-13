@@ -2,7 +2,7 @@ import React from 'react'
 import { Type } from 'lucide-react'
 import { TypographyLabel } from '../ui/typography'
 import { Button } from '../ui/button'
-import { CONTAINER_BASE_CLASSES } from './constants'
+import { CONTAINER_BASE_CLASSES } from '../constants'
 
 export default function TextContainer({
   ...rest
