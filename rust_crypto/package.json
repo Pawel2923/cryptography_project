@@ -5,6 +5,16 @@
   "license": "ISC",
   "author": "Pawel2923",
   "type": "module",
+  "types": "index.d.ts",
+  "main": "index.js",
+  "napi": {
+    "binaryName": "index",
+    "triples": [
+      "x86_64-pc-windows-msvc",
+      "x86_64-unknown-linux-gnu",
+      "x86_64-apple-darwin"
+    ]
+  },
   "scripts": {
     "build": "napi build --release"
   },
