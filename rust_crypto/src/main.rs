@@ -10,15 +10,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let encryption_result = AlgorithmAdapter::encrypt(
         "./src/example.txt".to_string(),
-        "3".to_string(),
-        "caesar-cipher".to_string(),
+        "kot".to_string(),
+        "vigenere-cipher".to_string(),
     )?;
     println!("Encrypted: {}", encryption_result);
 
     let decryption_result = AlgorithmAdapter::decrypt(
         "./src/example_encrypted.txt".to_string(),
-        "3".to_string(),
-        "caesar-cipher".to_string(),
+        "kot".to_string(),
+        "vigenere-cipher".to_string(),
     )?;
     println!("Decrypted: {}", decryption_result);
     Ok(())

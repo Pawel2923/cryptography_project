@@ -1,4 +1,5 @@
 use crate::algorithms::caesar::CaesarCipher;
+use crate::algorithms::vigenere::VigenereCipher;
 use crate::traits::Algorithm;
 
 pub struct AlgorithmAdapter;
@@ -12,6 +13,10 @@ impl AlgorithmAdapter {
         match algorithm.as_str() {
             "caesar-cipher" => {
                 let cipher = CaesarCipher::new(&key);
+                cipher.encrypt(&file_path)
+            }
+            "vigenere-cipher" => {
+                let cipher = VigenereCipher::new(&key)?;
                 cipher.encrypt(&file_path)
             }
             _ => Err(std::io::Error::new(
@@ -29,6 +34,10 @@ impl AlgorithmAdapter {
         match algorithm.as_str() {
             "caesar-cipher" => {
                 let cipher = CaesarCipher::new(&key);
+                cipher.decrypt(&file_path)
+            }
+            "vigenere-cipher" => {
+                let cipher = VigenereCipher::new(&key)?;
                 cipher.decrypt(&file_path)
             }
             _ => Err(std::io::Error::new(
