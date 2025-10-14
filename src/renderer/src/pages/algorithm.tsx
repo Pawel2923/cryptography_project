@@ -1,11 +1,10 @@
-import CaesarCipher from '@renderer/components/algorithm/CaesarCipher'
 import { BackButton } from '@renderer/components/BackButton'
 import Header from '@renderer/components/Header'
 import Main from '@renderer/components/Main'
 import { Button } from '@renderer/components/ui/button'
 import { TypographyH1 } from '@renderer/components/ui/typography'
 import { useTitle } from '@renderer/hooks/useTitle'
-import { getAlgorithm } from '@renderer/lib/algorithm-util'
+import { getAlgorithm, getAlgorithmComponent } from '@renderer/lib/algorithm-util'
 import React, { useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
@@ -63,12 +62,13 @@ export default function AlgorithmPage({
     }
   }
 
-  const algorithmComponent =
-    algorithm.id === 'caesar-cipher' ? (
-      <CaesarCipher description={algorithm.description} setKey={setKey} setIsValid={setIsValid} />
-    ) : (
-      algorithmNotImplemented
-    )
+  const mappedComponent = getAlgorithmComponent(algorithm.id, {
+    description: algorithm.description,
+    setKey,
+    setIsValid
+  })
+
+  const algorithmComponent = mappedComponent || algorithmNotImplemented
 
   return (
     <>

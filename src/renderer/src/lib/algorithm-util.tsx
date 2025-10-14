@@ -1,5 +1,9 @@
 import algorithms from '@renderer/assets/algorithms.json'
+import CaesarCipher from '@renderer/components/algorithm/CaesarCipher'
+import { CipherProps } from '@renderer/components/algorithm/cipher-props'
+import VigenereCipher from '@renderer/components/algorithm/VigenereCipher'
 import { iconMap } from '@renderer/lib/icon-map'
+import React from 'react'
 
 type Algorithm = Readonly<{
   id: string
@@ -23,5 +27,19 @@ export const getAlgorithm = (id: string): Algorithm | undefined => {
 }
 
 export const getAlgorithms = (): Algorithm[] => algorithmList
+
+export const getAlgorithmComponent = (
+  id: string,
+  props: CipherProps
+): React.ReactNode | undefined => {
+  switch (id) {
+    case 'caesar-cipher':
+      return <CaesarCipher {...props} />
+    case 'vigenere-cipher':
+      return <VigenereCipher {...props} />
+    default:
+      return undefined
+  }
+}
 
 export type { Algorithm }
