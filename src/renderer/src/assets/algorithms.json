@@ -4,5 +4,10 @@
     "name": "Szyfr Cezara",
     "description": "Prosty szyfr podstawieniowy, który przesuwa każdą literę o stałą liczbę miejsc w alfabecie.",
     "iconName": "text-wrap"
+  },
+  {
+    "id": "vigenere-cipher",
+    "name": "Szyfr Vigenère'a",
+    "description": "Szyfr polialfabetyczny, który używa serii różnych szyfrów Cezara na podstawie liter klucza."
   }
 ]
