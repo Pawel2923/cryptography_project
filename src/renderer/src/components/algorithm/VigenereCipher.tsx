@@ -25,7 +25,7 @@ export default function VigenereCipher({
           type="text"
           id="vigenere-key"
           minLength={2}
-          placeholder="Wrowadź klucz"
+          placeholder="Wprowadź klucz"
           onChange={changeHandler}
         />
       </Field>
