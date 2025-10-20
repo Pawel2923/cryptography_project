@@ -5,22 +5,40 @@ Wszystkie znaczące zmiany w tym projekcie będą dokumentowane w tym pliku.
 Format oparty jest na [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 a projekt stosuje się do [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-### [Niewydane]
+---
 
-#### Dodano
+## [1.1.0] - 2025-10-20
 
-##### Frontend (Renderer)
+### Dodano
 
-- [ ] Strona przetwarzania
+#### Frontend (Renderer)
 
-##### API (Proces Główny)
+- **Komponent szyfru Vigenere'a**: Pełny interfejs użytkownika z konfiguracją klucza
+- **Komponent szyfru z Kluczem Bieżącym**: Interfejs do szyfrowania z kluczem o długości tekstu
+- **Wybór operacji na stronie algorytmów**: Możliwość zmiany typu operacji (szyfrowanie/deszyfrowanie) bez powrotu do strony głównej
+- **Przewijanie pionowe**: Automatyczne przewijanie dla zbyt dużych komponentów
+- **Funkcja utility getAlgorithmComponent**: Dynamiczne ładowanie komponentów dodanych algorytmów
+- **Ulepszone komunikaty o błędach**: Szczegółowe informacje zwrotne dla użytkownika w przypadku niepowodzeń operacji
 
-- [ ] Śledzenie obecnego stanu przetwarzania pliku
+#### API (Proces Główny)
 
-##### Rust Crypto (Natywny Moduł)
+- **Typ Result**: System obsługi wyników operacji z bezpiecznym typowaniem
+- **Walidacja kluczy**: Sprawdzanie poprawności kluczy przed przetwarzaniem
+- **Długość zawartości pliku**: Dodanie informacji o rozmiarze danych w FileData
 
-- [ ] Nowe algorytmy kryptograficzne
-- [ ] Wysyłanie informacji o stanie przetwarzania pliku
+#### Rust Crypto (Natywny Moduł)
+
+- **Szyfr Vigenere'a**: Pełna implementacja algorytmu wieloalfabetowego
+- **Szyfr z Kluczem Bieżącym (Running Key Cipher)**: Implementacja szyfrowania z kluczem jednorazowym
+- **CryptoError**: Dedykowany typ błędów dla operacji kryptograficznych:
+  - Obsługa błędów plików (odczyt/zapis/brak pliku)
+  - Błędy walidacji klucza
+  - Błędy nieobsługiwanych algorytmów
+- **Ulepszona obsługa błędów**: Integracja Result utility we wszystkich operacjach na plikach i algorytmach
+
+### Naprawiono
+
+- Literówkę w placeholderze pola klucza
 
 ---
 

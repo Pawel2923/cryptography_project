@@ -2,7 +2,7 @@
 
 Aplikacja okienkowa stworzona w technologii **Electron** (z wykorzystaniem **React** i **TypeScript**) do szyfrowania i deszyfrowania tekstu oraz plików tekstowych.
 Projekt stanowi bazę do dalszej rozbudowy o kolejne algorytmy kryptograficzne.
-Pierwszym zaimplementowanym algorytmem jest **szyfr Cezara**.
+Zaimplementowane algorytmy: **szyfr Cezara**, **szyfr Vigenere'a** oraz **szyfr z Kluczem Bieżącym (Running Key Cipher)**.
 
 ---
 
@@ -13,7 +13,7 @@ Aplikacja umożliwia:
 - szyfrowanie i deszyfrowanie **wprowadzonego tekstu**,
 - szyfrowanie i deszyfrowanie **plików tekstowych (.txt)**,
 - zapisanie wyników do pliku lub ich podgląd bezpośrednio w interfejsie,
-- wybór liczby przesunięć (klucza szyfru Cezara).
+- konfigurację kluczy/parametrów algorytmów (np. przesunięcie dla Cezara, klucz dla Vigenere'a).
 
 Dzięki modularnej architekturze aplikacja pozwala na łatwe dodawanie kolejnych algorytmów kryptograficznych.
 
@@ -24,11 +24,11 @@ Dzięki modularnej architekturze aplikacja pozwala na łatwe dodawanie kolejnych
 **Szyfr Cezara** to jeden z najprostszych klasycznych algorytmów kryptograficznych.
 Działa poprzez przesunięcie każdej litery tekstu o określoną liczbę pozycji w alfabecie.
 
-### Przykład
+### Przykład (Cezar)
 
 Dla klucza `3`:
 
-```
+```text
 A → D
 B → E
 C → F
@@ -44,6 +44,40 @@ Aplikacja obsługuje zarówno **wielkie**, jak i **małe litery** alfabetu ASCII
 
 ---
 
+## Szyfr Vigenere'a
+
+Szyfr Vigenere'a to wieloalfabetowy szyfr podstawieniowy, w którym każda litera tekstu jawnego jest przesuwana o wartość odpowiadającą literze klucza (klucz powtarza się cyklicznie).
+Zapewnia większą odporność na analizę częstotliwości niż szyfr Cezara.
+
+### Przykład (Vigenere)
+
+Dla tekstu `TAJNA WIADOMOSC` i klucza `KOT`:
+
+```text
+Tekst:     TAJNA WIADOMOSC
+Klucz:     KOTKO TKOTKOTKO
+Rezultat: DOCXO PSOWYAHCQ
+```
+
+---
+
+## Szyfr z Kluczem Bieżącym (Running Key Cipher)
+
+Wariant szyfru Vigenere'a, w którym klucz ma długość co najmniej równą tekstowi (np. fragment książki/gazety) i nie powtarza się.
+Każda litera jest przesuwana o odpowiadającą jej literę długiego klucza, co utrudnia analizę częstotliwości.
+
+### Przykład (Klucz bieżący)
+
+Dla tekstu `TAJNA WIADOMOSC` i klucza `LOREMIPSUMDOLOR` (pierwsze 12 znaków):
+
+```text
+Tekst:     TAJNA WIADOMOSC
+Klucz:     LOREMIPSUMDOLOR
+Rezultat: EOARM EXSXAPCDQ
+```
+
+---
+
 ## Technologie
 
 - **Electron** — środowisko uruchomieniowe aplikacji desktopowych
@@ -56,7 +90,7 @@ Aplikacja obsługuje zarówno **wielkie**, jak i **małe litery** alfabetu ASCII
 
 ## Struktura projektu
 
-```
+```text
 cryptography_project/
 ├─ rust_crypto/ # moduł natywny Rust i kod źródłowy
 ├─ src/
