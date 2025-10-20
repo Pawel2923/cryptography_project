@@ -17,6 +17,7 @@ export default function AlgorithmPage({
   const navigate = useNavigate()
   const [key, setKey] = useState<string>('')
   const [isValid, setIsValid] = useState<boolean>(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const algorithmNotImplemented = (
     <div className="p-4 text-destructive">Alrgorytm nie jest zaimplementowany</div>
@@ -39,25 +40,30 @@ export default function AlgorithmPage({
 
     if (!isValid || !algorithm.id || !key) {
       console.error('Invalid options')
+      setErrorMessage('Nieprawidłowe opcje. Sprawdź czy klucz jest poprawny.')
       return
     }
 
     try {
       console.log('Running algorithm:', event.currentTarget.id)
+      setErrorMessage(null)
 
       const result = await window.api.file.process(operation, {
         key,
         algorithm: algorithm.id
       })
-      if (result.success) {
-        console.log('Algorithm result:', result.filePath)
+      if (result.ok) {
+        console.log('Algorithm result:', result.value)
         navigate(`/result`)
       } else {
-        console.error('Error processing file:', result.error)
+        const message = result.error || 'Przetwarzanie nie powiodło się'
+        console.error('Error processing file:', message)
+        setErrorMessage(message)
         await window.api.file.clear()
       }
     } catch (error) {
       console.error('Error running algorithm:', error)
+      setErrorMessage('Wystąpił nieoczekiwany błąd podczas przetwarzania pliku')
       await window.api.file.clear()
     }
   }
@@ -79,6 +85,11 @@ export default function AlgorithmPage({
         </TypographyH1>
       </Header>
       <Main className="flex-col md:max-w-3/4 mx-auto text-center">
+        {errorMessage && (
+          <div className="p-4 bg-destructive/10 border border-destructive rounded-md">
+            <p className="text-destructive">{errorMessage}</p>
+          </div>
+        )}
         <form onSubmit={runAlgorithm} className="grid gap-6">
           {algorithmComponent}
           <Button type="submit" disabled={!isValid}>

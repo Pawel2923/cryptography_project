@@ -1,34 +1,27 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
+import { Result } from '@shared/result-util'
+
+type FileData = {
+  name: string
+  size: number
+  path: string
+  length?: number
+}
 
 declare global {
   interface Window {
     electron: ElectronAPI
     api: {
       file: {
-        store: (
-          filename: string,
-          buffer: Uint8Array
-        ) => Promise<{
-          success: boolean
-          FileData?: { name: string; size: number; path: string }
-          error?: string
-        }>
-        getInfo: () => Promise<{
-          success: boolean
-          FileData?: { name: string; size: number; path: string; length: number }
-          error?: string
-        }>
+        store: (filename: string, buffer: Uint8Array) => Promise<Result<FileData, string>>
+        getInfo: () => Promise<Result<FileData, string>>
         process: (
           operation: 'encrypt' | 'decrypt',
           options: ProcessOptions
-        ) => Promise<{
-          success: boolean
-          filePath?: string
-          error?: string
-        }>
-        clear: () => Promise<{ success: boolean }>
-        download: (filePath?: string) => Promise<{ success: boolean; error?: string }>
-        preview: (filePath?: string) => Promise<{ success: boolean; error?: string }>
+        ) => Promise<Result<string, string>>
+        clear: () => Promise<Result<boolean, string>>
+        download: (filePath?: string) => Promise<Result<boolean, string>>
+        preview: (filePath?: string) => Promise<Result<boolean, string>>
       }
     }
   }

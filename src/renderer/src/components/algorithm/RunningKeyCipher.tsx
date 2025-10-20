@@ -4,7 +4,7 @@ import { Input } from '../ui/input'
 import { TypographyLabel } from '../ui/typography'
 import { CipherProps } from './cipher-props'
 import { Textarea } from '../ui/textarea'
-import { err, ok, Result } from '@renderer/lib/result-util'
+import { err, ok, Result } from '@shared/result-util'
 
 async function validateKey(key?: string | null): Promise<Result<boolean, string>> {
   if (!(typeof key === 'string' && /^[a-zA-Z]+$/.test(key) && key.length >= 2)) {
@@ -12,11 +12,11 @@ async function validateKey(key?: string | null): Promise<Result<boolean, string>
   }
 
   const res = await window.api.file.getInfo()
-  if (!res.success || !res.FileData || res.error) {
+  if (!res.ok) {
     return err(res.error || 'Nie można zweryfikować długości klucza z pliku.')
   }
 
-  if (res.FileData.length > key.length) {
+  if (res.value.length && res.value.length > key.length) {
     return err('Klucz jest krótszy niż tekst w pliku. Wybierz inny klucz.')
   }
 

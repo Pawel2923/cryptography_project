@@ -3,6 +3,7 @@ import fs from 'fs/promises'
 import { FileData, fileStore, ProcessOptions } from './FileStore'
 import { createRequire } from 'module'
 import path from 'path'
+import { Result, ok, err } from '../shared/result-util'
 
 const require = createRequire(import.meta.url)
 const rustCrypto = require('../../rust_crypto/index.node') as {
@@ -11,16 +12,10 @@ const rustCrypto = require('../../rust_crypto/index.node') as {
 }
 const { encrypt, decrypt } = rustCrypto
 
-type FileHandlerReturnType =
-  | { success: true; FileData: FileData }
-  | { success: false; error: string }
-
-type FileProcessReturnType = { success: true; filePath: string } | { success: false; error: string }
-
 export function setupFileHandlers(app: Electron.App): void {
   ipcMain.handle(
     'file:store',
-    async (_event, filename: string, buffer: Uint8Array): Promise<FileHandlerReturnType> => {
+    async (_event, filename: string, buffer: Uint8Array): Promise<Result<FileData, string>> => {
       try {
         const filePath = path.join(app.getPath('temp'), filename)
         await fs.writeFile(filePath, buffer)
@@ -35,39 +30,33 @@ export function setupFileHandlers(app: Electron.App): void {
 
         fileStore.setFileData(fileData)
 
-        return {
-          success: true,
-          FileData: { path: fileData.path, name: fileData.name, size: fileData.size }
-        }
+        return ok({ path: fileData.path, name: fileData.name, size: fileData.size })
       } catch (error) {
         console.error('Error storing file:', error)
-        return { success: false, error: 'Failed to store file' }
+        return err('Nie udało się zapisać pliku')
       }
     }
   )
 
-  ipcMain.handle('file:getInfo', async (): Promise<FileHandlerReturnType> => {
+  ipcMain.handle('file:getInfo', async (): Promise<Result<FileData, string>> => {
     try {
       const fileData = fileStore.getFileData()
 
       if (!fileData) {
-        return { success: false, error: 'No file stored' }
+        return err('Brak zapisanego pliku')
       }
 
       const text = await fs.readFile(fileData.path, 'utf-8')
 
-      return {
-        success: true,
-        FileData: {
-          name: fileData.name,
-          size: fileData.size,
-          path: fileData.path,
-          length: text.length
-        }
-      }
+      return ok({
+        name: fileData.name,
+        size: fileData.size,
+        path: fileData.path,
+        length: text.length
+      })
     } catch (error) {
       console.error('Error getting file info:', error)
-      return { success: false, error: 'Failed to get file info' }
+      return err('Nie udało się pobrać informacji o pliku')
     }
   })
 
@@ -77,7 +66,7 @@ export function setupFileHandlers(app: Electron.App): void {
       _event,
       operation: 'encrypt' | 'decrypt',
       options: ProcessOptions
-    ): Promise<FileProcessReturnType> => {
+    ): Promise<Result<string, string>> => {
       const fileData = fileStore.getFileData()
 
       if (
@@ -87,7 +76,7 @@ export function setupFileHandlers(app: Electron.App): void {
         !options.algorithm ||
         (await fs.stat(fileData.path).catch(() => false)) === false
       ) {
-        return { success: false, error: 'No file to process' }
+        return err('Brak pliku do przetworzenia')
       }
 
       try {
@@ -102,7 +91,7 @@ export function setupFileHandlers(app: Electron.App): void {
             break
           default:
             console.error('Invalid operation:', operation)
-            return { success: false, error: 'Invalid operation' }
+            return err('Nieprawidłowa operacja')
         }
 
         const processedStats = await fs.stat(result)
@@ -121,15 +110,15 @@ export function setupFileHandlers(app: Electron.App): void {
         }
 
         console.log('Processed file created:', result)
-        return { success: true, filePath: result }
+        return ok(result)
       } catch (error) {
         console.error('Error processing file:', error)
-        return { success: false, error: 'Processing failed' }
+        return err('Przetwarzanie nie powiodło się')
       }
     }
   )
 
-  ipcMain.handle('file:clear', async () => {
+  ipcMain.handle('file:clear', async (): Promise<Result<boolean, string>> => {
     const fileData = fileStore.getFileData()
     if (fileData) {
       try {
@@ -140,19 +129,19 @@ export function setupFileHandlers(app: Electron.App): void {
     }
 
     fileStore.clearFileData()
-    return { success: true }
+    return ok(true)
   })
 
   ipcMain.handle(
     'file:download',
-    async (_event, filePath?: string): Promise<{ success: boolean; error?: string }> => {
+    async (_event, filePath?: string): Promise<Result<boolean, string>> => {
       try {
         let targetPath = filePath
         if (!targetPath) {
           const fileData = fileStore.getFileData()
           console.log('file:download - fileData from store:', fileData)
           if (!fileData) {
-            return { success: false, error: 'No file available for download' }
+            return err('Brak pliku do pobrania')
           }
           targetPath = fileData.path
         }
@@ -167,29 +156,29 @@ export function setupFileHandlers(app: Electron.App): void {
         })
 
         if (canceled || !savePath) {
-          return { success: false, error: 'Save operation was cancelled' }
+          return err('Operacja zapisu została anulowana')
         }
 
         await fs.writeFile(savePath, data)
         console.log('file:download - file saved successfully to:', savePath)
-        return { success: true }
+        return ok(true)
       } catch (error) {
         console.error('Error downloading file:', error)
-        return { success: false, error: 'Failed to download file' }
+        return err('Nie udało się pobrać pliku')
       }
     }
   )
 
   ipcMain.handle(
     'file:preview',
-    async (_event, filePath?: string): Promise<{ success: boolean; error?: string }> => {
+    async (_event, filePath?: string): Promise<Result<boolean, string>> => {
       try {
         let targetPath = filePath
         if (!targetPath) {
           const fileData = fileStore.getFileData()
           console.log('file:preview - fileData from store:', fileData)
           if (!fileData) {
-            return { success: false, error: 'No file available for preview' }
+            return err('Brak pliku do podglądu')
           }
           targetPath = fileData.path
         }
@@ -206,10 +195,10 @@ export function setupFileHandlers(app: Electron.App): void {
         await fs.writeFile(tempPreviewPath, data)
         console.log('file:preview - preview file created:', tempPreviewPath)
         await shell.openPath(tempPreviewPath)
-        return { success: true }
+        return ok(true)
       } catch (error) {
         console.error('Error previewing file:', error)
-        return { success: false, error: 'Failed to preview file' }
+        return err('Nie udało się wyświetlić podglądu pliku')
       }
     }
   )

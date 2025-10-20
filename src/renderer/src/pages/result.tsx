@@ -5,44 +5,56 @@ import { TypographyH1 } from '@renderer/components/ui/typography'
 import { useTitle } from '@renderer/hooks/useTitle'
 import { ArrowDownToLine, ExternalLink } from 'lucide-react'
 import { useNavigate } from 'react-router'
+import { useState } from 'react'
 
 export default function ResultPage(): React.ReactNode {
   useTitle('Wynik operacji')
   const navigate = useNavigate()
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const downloadResult = async (): Promise<void> => {
     try {
+      setErrorMessage(null)
       const download = await window.api.file.download()
-      if (download.success) {
+      if (download.ok) {
         console.log('File downloaded successfully')
       } else {
-        console.error('Error downloading file:', download.error)
+        const message = download.error || 'Nie udało się pobrać pliku'
+        console.error('Error downloading file:', message)
+        setErrorMessage(message)
       }
     } catch (error) {
       console.error('Error downloading result:', error)
+      setErrorMessage('Wystąpił nieoczekiwany błąd podczas pobierania pliku')
     }
   }
 
   const previewResult = async (): Promise<void> => {
     try {
+      setErrorMessage(null)
       const preview = await window.api.file.preview()
-      if (!preview.success) {
-        console.error('Error previewing file:', preview.error)
+      if (!preview.ok) {
+        const message = preview.error || 'Nie udało się wyświetlić podglądu pliku'
+        console.error('Error previewing file:', message)
+        setErrorMessage(message)
       } else {
         console.log('File previewed successfully')
       }
     } catch (error) {
       console.error('Error previewing result:', error)
+      setErrorMessage('Wystąpił nieoczekiwany błąd podczas wyświetlania podglądu')
     }
   }
 
   const clearFile = async (): Promise<void> => {
     try {
+      setErrorMessage(null)
       await window.api.file.clear()
       console.log('File cleared successfully')
       navigate('/')
     } catch (error) {
       console.error('Error clearing file:', error)
+      setErrorMessage('Wystąpił nieoczekiwany błąd podczas czyszczenia pliku')
     }
   }
 
@@ -52,6 +64,11 @@ export default function ResultPage(): React.ReactNode {
         <TypographyH1>Wynik operacji</TypographyH1>
       </Header>
       <Main className="flex-col gap-6">
+        {errorMessage && (
+          <div className="p-4 bg-destructive/10 border border-destructive rounded-md">
+            <p className="text-destructive">{errorMessage}</p>
+          </div>
+        )}
         <div className="flex gap-4">
           <Button onClick={downloadResult}>
             <ArrowDownToLine aria-hidden="true" />

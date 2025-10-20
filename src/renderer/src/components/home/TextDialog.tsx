@@ -35,8 +35,12 @@ export default function TextDialog(): React.ReactNode {
     useTextForm({ minLength: 3, required: true })
 
   const pasteBtnClickHandler = async (): Promise<void> => {
-    const text = await readLastCopiedText()
-    handlePaste(text)
+    const result = await readLastCopiedText()
+    if (result.ok) {
+      handlePaste(result.value)
+    } else {
+      handlePaste(null)
+    }
   }
 
   const submitHandler = (event: React.FormEvent): void => {
