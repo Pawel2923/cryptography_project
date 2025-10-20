@@ -9,5 +9,10 @@
     "id": "vigenere-cipher",
     "name": "Szyfr Vigenère'a",
     "description": "Szyfr polialfabetyczny, który używa serii różnych szyfrów Cezara na podstawie liter klucza."
+  },
+  {
+    "id": "running-key-cipher",
+    "name": "Szyfr z Kluczem Bieżącym",
+    "description": "Udoskonalona wersja szyfru Vigenère'a, która używa długiego fragmentu tekstu jako klucza."
   }
 ]
