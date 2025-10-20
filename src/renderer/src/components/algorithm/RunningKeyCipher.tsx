@@ -1,33 +1,63 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Field, FieldLabel } from '../ui/field'
 import { Input } from '../ui/input'
 import { TypographyLabel } from '../ui/typography'
 import { CipherProps } from './cipher-props'
 import { Textarea } from '../ui/textarea'
+import { err, ok, Result } from '@renderer/lib/result-util'
+
+async function validateKey(key?: string | null): Promise<Result<boolean, string>> {
+  if (!(typeof key === 'string' && /^[a-zA-Z]+$/.test(key) && key.length >= 2)) {
+    return err('Klucz musi składać się z co najmniej dwóch liter alfabetu.')
+  }
+
+  const res = await window.api.file.getInfo()
+  if (!res.success || !res.FileData || res.error) {
+    return err(res.error || 'Nie można zweryfikować długości klucza z pliku.')
+  }
+
+  if (res.FileData.length > key.length) {
+    return err('Klucz jest krótszy niż tekst w pliku. Wybierz inny klucz.')
+  }
+
+  return ok(true)
+}
 
 export default function RunningKeyCipher({
   description,
   setKey,
   setIsValid
 }: CipherProps): React.ReactNode {
-  const [keyValue, setKeyValue] = React.useState('')
+  const [keyValue, setKeyValue] = useState('')
+  const [validationMessage, setValidationMessage] = useState<string | null>(null)
+  const [hasInteracted, setHasInteracted] = useState(false)
 
   useEffect(() => {
-    if (keyValue && /^[a-zA-Z]+$/.test(keyValue) && keyValue.length >= 2) {
-      setKey(keyValue)
-      setIsValid(true)
-    } else {
-      setIsValid(false)
-    }
-  }, [keyValue, setIsValid, setKey])
+    async function validate(): Promise<void> {
+      const normalizedKey = keyValue.replace(/[^a-zA-Z]/g, '')
+      const result = await validateKey(normalizedKey)
 
-  const replaceNonAlphabetic = (value: string): string => {
-    return value.replace(/[^a-zA-Z]/g, '')
-  }
+      if (result.ok) {
+        setKey(normalizedKey)
+        setIsValid(true)
+        if (hasInteracted) {
+          setValidationMessage(null)
+        }
+      } else {
+        setIsValid(false)
+        if (hasInteracted) {
+          setValidationMessage(result.error)
+        }
+      }
+    }
+
+    validate()
+  }, [keyValue, setIsValid, setKey, hasInteracted])
 
   const changeHandler = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
     const value = e.target.value
-    setKeyValue(replaceNonAlphabetic(value))
+    setHasInteracted(true)
+    setKeyValue(value)
   }
 
   const fileChangeHandler = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -39,7 +69,8 @@ export default function RunningKeyCipher({
 
     const reader = new FileReader()
     reader.onload = (event) => {
-      const key = replaceNonAlphabetic(event.target?.result as string)
+      const key = event.target?.result as string
+      setHasInteracted(true)
       setKeyValue(key)
     }
 
@@ -65,6 +96,7 @@ export default function RunningKeyCipher({
         <FieldLabel htmlFor="running-key-file">Klucz z pliku tekstowego.</FieldLabel>
         <Input type="file" accept=".txt" id="running-key-file" onChange={fileChangeHandler} />
       </Field>
+      {validationMessage && <p className="text-destructive">{validationMessage}</p>}
     </>
   )
 }
