@@ -66,7 +66,7 @@ export default function TextDialog(): React.ReactNode {
       <DialogTrigger asChild>
         <TextContainer />
       </DialogTrigger>
-      <DialogContent className="max-h-screen">
+      <DialogContent className="max-h-screen overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Przetwarzanie tekstu</DialogTitle>
         </DialogHeader>
@@ -105,6 +105,7 @@ export default function TextDialog(): React.ReactNode {
                   value={textValue}
                   onChange={handleTextChange}
                   aria-invalid={hasErrors}
+                  className="h-16 overflow-y-auto"
                 />
                 <DialogDescription asChild>
                   <FieldDescription>Wprowadź lub wklej tekst do przetworzenia</FieldDescription>

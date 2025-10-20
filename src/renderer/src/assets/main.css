@@ -2,7 +2,7 @@
 
 body {
   display: flex;
-  overflow: hidden;
+  overflow-x: hidden;
   user-select: none;
 }
 

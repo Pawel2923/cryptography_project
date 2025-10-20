@@ -58,6 +58,7 @@ export default function RunningKeyCipher({
           placeholder="Wprowadź klucz"
           onChange={changeHandler}
           value={keyValue}
+          className="wrap-anywhere h-32 overflow-y-auto"
         ></Textarea>
       </Field>
       <Field className="text-center">
