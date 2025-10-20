@@ -46,22 +46,28 @@ export function setupFileHandlers(app: Electron.App): void {
     }
   )
 
-  ipcMain.handle('file:getInfo', (): FileHandlerReturnType => {
-    const fileData = fileStore.getFileData()
+  ipcMain.handle('file:getInfo', async (): Promise<FileHandlerReturnType> => {
+    try {
+      const fileData = fileStore.getFileData()
 
-    console.log('file:getInfo called, current fileData:', fileData)
-
-    if (!fileData) {
-      return { success: false, error: 'No file stored' }
-    }
-
-    return {
-      success: true,
-      FileData: {
-        name: fileData.name,
-        size: fileData.size,
-        path: fileData.path
+      if (!fileData) {
+        return { success: false, error: 'No file stored' }
       }
+
+      const text = await fs.readFile(fileData.path, 'utf-8')
+
+      return {
+        success: true,
+        FileData: {
+          name: fileData.name,
+          size: fileData.size,
+          path: fileData.path,
+          length: text.length
+        }
+      }
+    } catch (error) {
+      console.error('Error getting file info:', error)
+      return { success: false, error: 'Failed to get file info' }
     }
   })
 

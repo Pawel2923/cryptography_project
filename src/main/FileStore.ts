@@ -2,6 +2,7 @@ export type FileData = {
   path: string
   name: string
   size: number
+  length?: number
 } | null
 
 export type ProcessOptions = {

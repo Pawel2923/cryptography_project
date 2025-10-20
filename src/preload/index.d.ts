@@ -15,7 +15,7 @@ declare global {
         }>
         getInfo: () => Promise<{
           success: boolean
-          FileData?: { name: string; size: number; path: string }
+          FileData?: { name: string; size: number; path: string; length: number }
           error?: string
         }>
         process: (
