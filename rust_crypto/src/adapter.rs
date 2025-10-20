@@ -19,6 +19,11 @@ impl AlgorithmAdapter {
                 let cipher = VigenereCipher::new(&key)?;
                 cipher.encrypt(&file_path)
             }
+            "running-key-cipher" => {
+                let cipher =
+                    crate::algorithms::running_key_cipher::RunningKeyCipher::new(&key, &file_path)?;
+                cipher.encrypt(&file_path)
+            }
             _ => Err(std::io::Error::new(
                 std::io::ErrorKind::InvalidInput,
                 format!("Unsupported algorithm {}", algorithm),
@@ -38,6 +43,11 @@ impl AlgorithmAdapter {
             }
             "vigenere-cipher" => {
                 let cipher = VigenereCipher::new(&key)?;
+                cipher.decrypt(&file_path)
+            }
+            "running-key-cipher" => {
+                let cipher =
+                    crate::algorithms::running_key_cipher::RunningKeyCipher::new(&key, &file_path)?;
                 cipher.decrypt(&file_path)
             }
             _ => Err(std::io::Error::new(

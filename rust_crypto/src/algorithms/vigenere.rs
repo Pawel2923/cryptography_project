@@ -20,7 +20,7 @@ impl VigenereCipher {
     }
 }
 
-enum Operation {
+pub enum Operation {
     Encrypt,
     Decrypt,
 }
@@ -49,7 +49,7 @@ impl Algorithm for VigenereCipher {
     }
 }
 
-fn vigenere(text: &str, key: &str, operation: &Operation) -> String {
+pub fn vigenere(text: &str, key: &str, operation: &Operation) -> String {
     let key_shifts: Vec<i8> = key
         .bytes()
         .filter(|b| b.is_ascii_alphabetic())
