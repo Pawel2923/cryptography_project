@@ -1,5 +1,6 @@
 mod adapter;
 mod algorithms;
+mod error;
 mod traits;
 mod utils;
 use adapter::AlgorithmAdapter;

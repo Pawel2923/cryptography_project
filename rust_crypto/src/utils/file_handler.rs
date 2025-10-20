@@ -1,33 +1,27 @@
-pub fn read_file(file_path: &str) -> Result<String, std::io::Error> {
+use crate::error::CryptoError;
+
+pub fn read_file(file_path: &str) -> Result<String, CryptoError> {
     use std::fs;
 
-    match fs::read_to_string(file_path) {
-        Ok(contents) => Ok(contents),
-        Err(e) => {
-            eprintln!("Error reading file: {}", e);
-            Err(e)
-        }
-    }
+    fs::read_to_string(file_path).map_err(|e| {
+        eprintln!("Błąd odczytu pliku: {}", e);
+        CryptoError::from(e)
+    })
 }
 
-pub fn write_file(file_path: &str, content: &str) -> Result<(), std::io::Error> {
+pub fn write_file(file_path: &str, content: &str) -> Result<(), CryptoError> {
     use std::fs;
     use std::io::Write;
 
-    match fs::File::create(file_path) {
-        Ok(mut file) => {
-            if let Err(e) = file.write_all(content.as_bytes()) {
-                eprintln!("Error writing to file: {}", e);
-                Err(e)
-            } else {
-                Ok(())
-            }
-        }
-        Err(e) => {
-            eprintln!("Error creating file: {}", e);
-            Err(e)
-        }
-    }
+    let mut file = fs::File::create(file_path).map_err(|e| {
+        eprintln!("Błąd tworzenia pliku: {}", e);
+        CryptoError::FileWriteError(format!("Nie można utworzyć pliku: {}", e))
+    })?;
+
+    file.write_all(content.as_bytes()).map_err(|e| {
+        eprintln!("Błąd zapisu do pliku: {}", e);
+        CryptoError::FileWriteError(format!("Nie można zapisać do pliku: {}", e))
+    })
 }
 
 pub fn create_output_path_with_suffix(input_path: &str, suffix: &str) -> String {

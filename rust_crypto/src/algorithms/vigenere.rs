@@ -1,16 +1,14 @@
-use crate::{traits::Algorithm, utils::file_handler};
-use std::io::{Error, ErrorKind};
+use crate::{error::CryptoError, traits::Algorithm, utils::file_handler};
 
 pub struct VigenereCipher {
     key: String,
 }
 
 impl VigenereCipher {
-    pub fn new(key: &str) -> Result<Self, Error> {
+    pub fn new(key: &str) -> Result<Self, CryptoError> {
         if key.is_empty() || !key.chars().any(|c| c.is_ascii_alphabetic()) {
-            return Err(Error::new(
-                ErrorKind::InvalidInput,
-                "Key must be a non-empty string containing at least one alphabetic character.",
+            return Err(CryptoError::InvalidKey(
+                "Klucz musi zawierać co najmniej jedną literę alfabetu".to_string(),
             ));
         }
 
@@ -26,7 +24,7 @@ pub enum Operation {
 }
 
 impl Algorithm for VigenereCipher {
-    fn encrypt(&self, file_path: &str) -> Result<String, Error> {
+    fn encrypt(&self, file_path: &str) -> Result<String, CryptoError> {
         let text = file_handler::read_file(file_path)?;
 
         let encrypted: String = vigenere(&text, &self.key, &Operation::Encrypt);
@@ -37,7 +35,7 @@ impl Algorithm for VigenereCipher {
         Ok(encrypted_path_str)
     }
 
-    fn decrypt(&self, file_path: &str) -> Result<String, Error> {
+    fn decrypt(&self, file_path: &str) -> Result<String, CryptoError> {
         let text = file_handler::read_file(file_path)?;
 
         let decrypted: String = vigenere(&text, &self.key, &Operation::Decrypt);

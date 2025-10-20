@@ -1,25 +1,30 @@
-use crate::{traits::Algorithm, utils::file_handler};
+use crate::{error::CryptoError, traits::Algorithm, utils::file_handler};
 
 pub struct CaesarCipher {
-    key: String,
+    key: i8,
 }
 
 impl CaesarCipher {
-    pub fn new(key: &str) -> Self {
-        CaesarCipher {
-            key: key.to_string(),
+    pub fn new(key: &str) -> Result<Self, CryptoError> {
+        let key_num = key.parse::<i8>().map_err(|_| {
+            CryptoError::InvalidKey("Klucz musi być liczbą całkowitą od 1 do 25".to_string())
+        })?;
+
+        if !(1..=25).contains(&key_num) {
+            return Err(CryptoError::InvalidKey(
+                "Klucz musi być w zakresie od 1 do 25".to_string(),
+            ));
         }
+
+        Ok(CaesarCipher { key: key_num })
     }
 }
 
 impl Algorithm for CaesarCipher {
-    fn encrypt(&self, file_path: &str) -> Result<String, std::io::Error> {
+    fn encrypt(&self, file_path: &str) -> Result<String, CryptoError> {
         let text = file_handler::read_file(file_path)?;
-        let key_num = self.key.parse::<i8>().map_err(|_| {
-            std::io::Error::new(std::io::ErrorKind::InvalidInput, "Invalid key format")
-        })?;
 
-        let encrypted: String = text.chars().map(|c| caesar_shift(c, key_num)).collect();
+        let encrypted: String = text.chars().map(|c| caesar_shift(c, self.key)).collect();
 
         let encrypted_path_str =
             file_handler::create_output_path_with_suffix(file_path, "_encrypted");
@@ -27,13 +32,10 @@ impl Algorithm for CaesarCipher {
         Ok(encrypted_path_str)
     }
 
-    fn decrypt(&self, file_path: &str) -> Result<String, std::io::Error> {
+    fn decrypt(&self, file_path: &str) -> Result<String, CryptoError> {
         let text = file_handler::read_file(file_path)?;
-        let key_num = self.key.parse::<i8>().map_err(|_| {
-            std::io::Error::new(std::io::ErrorKind::InvalidInput, "Invalid key format")
-        })?;
 
-        let decrypted: String = text.chars().map(|c| caesar_shift(c, -key_num)).collect();
+        let decrypted: String = text.chars().map(|c| caesar_shift(c, -self.key)).collect();
 
         let decrypted_path_str =
             file_handler::create_output_path_with_suffix(file_path, "_decrypted");
