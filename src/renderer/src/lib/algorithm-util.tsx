@@ -1,4 +1,5 @@
 import algorithms from '@renderer/assets/algorithms.json'
+import AES from '@renderer/components/algorithm/AES'
 import CaesarCipher from '@renderer/components/algorithm/CaesarCipher'
 import { CipherProps } from '@renderer/components/algorithm/cipher-props'
 import RunningKeyCipher from '@renderer/components/algorithm/RunningKeyCipher'
@@ -40,6 +41,8 @@ export const getAlgorithmComponent = (
       return <VigenereCipher {...props} />
     case 'running-key-cipher':
       return <RunningKeyCipher {...props} />
+    case 'aes':
+      return <AES {...props} />
     default:
       return undefined
   }

@@ -14,5 +14,11 @@
     "id": "running-key-cipher",
     "name": "Szyfr z Kluczem Bieżącym",
     "description": "Udoskonalona wersja szyfru Vigenère'a, która używa długiego fragmentu tekstu jako klucza."
+  },
+  {
+    "id": "aes",
+    "name": "AES",
+    "description": "Advanced Encryption Standard - symetryczny algorytm szyfrowania blokowego z obsługą klucza 128-bitowego.",
+    "iconName": "lock"
   }
 ]
