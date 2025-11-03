@@ -10,11 +10,17 @@ function validateKey(key: string): Result<boolean, string> {
     return err('Klucz jest wymagany')
   }
 
+  // eslint-disable-next-line no-control-regex
+  const isAscii = /^[\x00-\x7F]*$/.test(key)
+  if (!isAscii) {
+    return err('Klucz może zawierać tylko znaki ASCII')
+  }
+
   const requiredLength = 16
-  const keyBytes = new TextEncoder().encode(key).length
+  const keyBytes = key.length
 
   if (keyBytes !== requiredLength) {
-    return err(`Klucz musi mieć dokładnie ${requiredLength} bajtów (AES-128)`)
+    return err(`Klucz musi mieć dokładnie ${requiredLength} znaków (AES-128)`)
   }
 
   return ok(true)

@@ -16,9 +16,9 @@ pub struct AesCipher {
 impl AesCipher {
     pub fn new(key: &str) -> Result<Self, CryptoError> {
         let key_bytes = key.as_bytes();
-        if key_bytes.len() != 16 && key_bytes.len() != 24 && key_bytes.len() != 32 {
+        if key_bytes.len() != 16 {
             return Err(CryptoError::InvalidKey(
-                "AES key must be 16, 24, or 32 bytes".to_string(),
+                "AES key must be exactly 16 bytes (AES-128)".to_string(),
             ));
         }
 
