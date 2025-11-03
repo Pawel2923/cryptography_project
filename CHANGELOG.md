@@ -7,6 +7,60 @@ a projekt stosuje się do [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ---
 
+## [1.2.0] - 2025-11-03
+
+### Dodano
+
+#### Frontend (Renderer)
+
+- **Komponent AES-GCM**: Pełny interfejs użytkownika z konfiguracją klucza 128-bitowego
+- **Walidacja klucza AES**: Sprawdzanie długości klucza (16 bajtów) i wymóg znaków ASCII
+- **Informacje o trybie szyfrowania**: Wyświetlanie informacji o użyciu trybu GCM (Galois/Counter Mode) z autentykacją
+- **Ikona zamka**: Nowa ikona dla algorytmu AES-GCM w interfejsie użytkownika
+
+#### API (Proces Główny)
+
+- **Obsługa algorytmu AES-GCM**: Integracja nowego algorytmu szyfrowania symetrycznego z autentykacją
+
+#### Rust Crypto (Natywny Moduł)
+
+- **AES-128 w trybie GCM**: Pełna implementacja Advanced Encryption Standard z 128-bitowym kluczem
+  - Tryb GCM (Galois/Counter Mode) zapewniający szyfrowanie i autentykację (AEAD)
+  - Automatyczna generacja losowego nonce (12 bajtów) dla każdej operacji szyfrowania
+  - Funkcja GHASH dla autentykacji danych
+  - Obsługa dodatkowych danych autentykowanych (AAD) - nazwa pliku
+  - Weryfikacja integralności i autentyczności podczas deszyfrowania
+  - Bezpieczne porównanie tagów autentykacji (constant-time comparison)
+- **Kluczowe funkcje AES**:
+  - `key_expansion`: Rozszerzanie klucza na klucze rundowe
+  - `sub_bytes`: Podstawienie bajtów przy użyciu S-Box
+  - `shift_rows`: Przesunięcie wierszy w macierzy stanu
+  - `mix_columns`: Mieszanie kolumn z użyciem mnożenia w GF(2^8)
+  - `add_round_key`: XOR z kluczem rundowym
+- **Funkcje GCM**:
+  - `gf128_mul`: Mnożenie w ciele Galois GF(2^128)
+  - `ghash`: Funkcja haszująca dla autentykacji
+  - `derive_j0`: Wyprowadzanie wartości początkowej licznika z nonce
+  - `inc32`: Inkrementacja 32-bitowego licznika
+  - `aes_gcm_encrypt`: Szyfrowanie z autentykacją
+  - `aes_gcm_decrypt`: Deszyfrowanie z weryfikacją autentyczności
+- **Moduły pomocnicze**:
+  - `aes_constants.rs`: Tablice S-Box, RCON i stałe rozmiaru bloku
+  - `aes_helpers.rs`: Funkcje pomocnicze (rot_word, sub_word, gmul)
+- **Format wyjściowy**: Nonce (12 B) + Szyfrogram + Tag autentykacji (16 B) w formacie heksadecymalnym
+- **Bezpieczeństwo**:
+  - Kryptograficznie bezpieczny generator liczb losowych dla nonce
+  - Weryfikacja autentyczności przed deszyfrowaniem
+  - Ochrona przed atakami timing poprzez constant-time comparison
+
+### Ulepszone
+
+#### Rust Crypto (Natywny Moduł)
+
+- **Rozszerzony adapter algorytmów**: Dodano obsługę AES-GCM w AlgorithmAdapter
+
+---
+
 ## [1.1.0] - 2025-10-20
 
 ### Dodano

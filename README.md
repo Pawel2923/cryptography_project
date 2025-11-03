@@ -2,7 +2,7 @@
 
 Aplikacja okienkowa stworzona w technologii **Electron** (z wykorzystaniem **React** i **TypeScript**) do szyfrowania i deszyfrowania tekstu oraz plików tekstowych.
 Projekt stanowi bazę do dalszej rozbudowy o kolejne algorytmy kryptograficzne.
-Zaimplementowane algorytmy: **szyfr Cezara**, **szyfr Vigenere'a** oraz **szyfr z Kluczem Bieżącym (Running Key Cipher)**.
+Zaimplementowane algorytmy: **szyfr Cezara**, **szyfr Vigenere'a**, **szyfr z Kluczem Bieżącym (Running Key Cipher)** oraz **AES-GCM**.
 
 ---
 
@@ -74,6 +74,61 @@ Dla tekstu `TAJNA WIADOMOSC` i klucza `LOREMIPSUMDOLOR` (pierwsze 12 znaków):
 Tekst:     TAJNA WIADOMOSC
 Klucz:     LOREMIPSUMDOLOR
 Rezultat: EOARM EXSXAPCDQ
+```
+
+---
+
+## AES-GCM (Advanced Encryption Standard - Galois/Counter Mode)
+
+**AES-GCM** to nowoczesny symetryczny algorytm szyfrowania blokowego z autentykacją (AEAD - Authenticated Encryption with Associated Data).
+Łączy szyfrowanie AES w trybie licznikowym (CTR) z funkcją autentykacji GHASH opartą na ciele Galois.
+
+### Cechy AES-GCM
+
+- **Rozmiar klucza**: 128 bitów (16 bajtów)
+- **Tryb**: GCM (Galois/Counter Mode)
+- **Autentykacja**: AEAD - szyfrowanie z weryfikacją integralności
+- **Nonce**: 12 bajtów, generowany losowo dla każdej operacji
+- **Tag autentykacji**: 16 bajtów (128 bitów)
+- **Dodatkowe dane autentykowane (AAD)**: Nazwa pliku
+
+### Jak działa?
+
+1. **Szyfrowanie**:
+   - Generowany jest losowy nonce (12 bajtów)
+   - Tekst jawny jest szyfrowany w trybie licznikowym (CTR)
+   - Obliczany jest tag autentykacji GHASH dla szyfrogramu i AAD
+   - Wynik: nonce + szyfrogram + tag (format heksadecymalny)
+
+2. **Deszyfrowanie**:
+   - Odczytywany jest nonce, szyfrogram i tag z danych wejściowych
+   - Obliczany jest oczekiwany tag autentykacji
+   - Weryfikacja autentyczności (porównanie tagów w czasie stałym)
+   - Jeśli weryfikacja się powiedzie, tekst jest deszyfrowany
+   - W przypadku niepowodzenia weryfikacji, deszyfrowanie jest przerywane
+
+### Bezpieczeństwo
+
+- **Kryptograficznie bezpieczny generator liczb losowych** dla nonce
+- **Weryfikacja autentyczności** przed deszyfrowaniem chroni przed modyfikacją danych
+- **Constant-time comparison** tagów autentykacji zapobiega atakom timing
+- **Unikalny nonce** dla każdej operacji szyfrowania zapewnia bezpieczeństwo
+
+### Przykład
+
+Dla tekstu `TAJNA WIADOMOSC` i klucza `1234567890123456`:
+
+```text
+Szyfrowanie:
+  Tekst jawny: TAJNA WIADOMOSC
+  Klucz:       1234567890123456 (16 bajtów)
+  Nonce:       [losowo generowany, 12 bajtów]
+  Wynik:       [nonce][szyfrogram][tag] (format hex)
+
+Deszyfrowanie:
+  Wejście:     [nonce][szyfrogram][tag]
+  Weryfikacja: Tag autentykacji
+  Wynik:       TAJNA WIADOMOSC (jeśli weryfikacja się powiodła)
 ```
 
 ---
