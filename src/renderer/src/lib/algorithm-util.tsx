@@ -41,7 +41,7 @@ export const getAlgorithmComponent = (
       return <VigenereCipher {...props} />
     case 'running-key-cipher':
       return <RunningKeyCipher {...props} />
-    case 'aes':
+    case 'aes-gcm':
       return <AES {...props} />
     default:
       return undefined

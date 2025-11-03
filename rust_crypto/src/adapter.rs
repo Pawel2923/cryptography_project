@@ -25,6 +25,10 @@ impl AlgorithmAdapter {
                     crate::algorithms::running_key_cipher::RunningKeyCipher::new(&key, &file_path)?;
                 cipher.encrypt(&file_path)
             }
+            "aes-gcm" => {
+                let cipher = crate::algorithms::aes::AesCipher::new(&key)?;
+                cipher.encrypt(&file_path)
+            }
             _ => Err(CryptoError::UnsupportedAlgorithm(algorithm)),
         }
     }
@@ -46,6 +50,10 @@ impl AlgorithmAdapter {
             "running-key-cipher" => {
                 let cipher =
                     crate::algorithms::running_key_cipher::RunningKeyCipher::new(&key, &file_path)?;
+                cipher.decrypt(&file_path)
+            }
+            "aes-gcm" => {
+                let cipher = crate::algorithms::aes::AesCipher::new(&key)?;
                 cipher.decrypt(&file_path)
             }
             _ => Err(CryptoError::UnsupportedAlgorithm(algorithm)),

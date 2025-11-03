@@ -10,15 +10,11 @@ function validateKey(key: string): Result<boolean, string> {
     return err('Klucz jest wymagany')
   }
 
-  const requiredLength = 16 // 128 bits / 8 = 16 bytes
+  const requiredLength = 16
   const keyBytes = new TextEncoder().encode(key).length
 
-  if (keyBytes < requiredLength) {
-    return err(`Klucz musi mieć dokładnie ${requiredLength} bajtów`)
-  }
-
-  if (keyBytes > requiredLength) {
-    return err(`Klucz musi mieć dokładnie ${requiredLength} bajtów`)
+  if (keyBytes !== requiredLength) {
+    return err(`Klucz musi mieć dokładnie ${requiredLength} bajtów (AES-128)`)
   }
 
   return ok(true)
@@ -55,14 +51,18 @@ export default function AES({ description, setKey, setIsValid }: CipherProps): R
   return (
     <>
       {description && <TypographyLabel>{description}</TypographyLabel>}
+      <div className="text-sm text-muted-foreground mb-2">
+        Tryb: GCM (Galois/Counter Mode) z autentykacją
+      </div>
       <Field className="text-center">
-        <FieldLabel htmlFor="aes-key">Klucz (16 bajtów)</FieldLabel>
+        <FieldLabel htmlFor="aes-key">Klucz (16 bajtów dla AES-128)</FieldLabel>
         <Input
           id="aes-key"
           type="text"
           placeholder="Wprowadź klucz (16 bajtów)"
           onChange={changeHandler}
           value={keyValue}
+          maxLength={16}
         />
       </Field>
       {validationMessage && <p className="text-destructive">{validationMessage}</p>}

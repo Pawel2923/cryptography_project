@@ -9,6 +9,8 @@ pub enum CryptoError {
     UnsupportedAlgorithm(String),
     KeyTooShort(String),
     IoError(std::io::Error),
+    DecryptionError(String),
+    InvalidFormat(String),
 }
 
 impl fmt::Display for CryptoError {
@@ -34,6 +36,12 @@ impl fmt::Display for CryptoError {
             }
             CryptoError::IoError(err) => {
                 write!(f, "Błąd wejścia/wyjścia: {}", err)
+            }
+            CryptoError::DecryptionError(msg) => {
+                write!(f, "Błąd deszyfrowania: {}", msg)
+            }
+            CryptoError::InvalidFormat(msg) => {
+                write!(f, "Nieprawidłowy format danych: {}", msg)
             }
         }
     }

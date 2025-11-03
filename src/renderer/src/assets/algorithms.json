@@ -16,9 +16,9 @@
     "description": "Udoskonalona wersja szyfru Vigenère'a, która używa długiego fragmentu tekstu jako klucza."
   },
   {
-    "id": "aes",
-    "name": "AES",
-    "description": "Advanced Encryption Standard - symetryczny algorytm szyfrowania blokowego z obsługą klucza 128-bitowego.",
+    "id": "aes-gcm",
+    "name": "AES-GCM",
+    "description": "Advanced Encryption Standard w trybie GCM (Galois/Counter Mode) - symetryczny algorytm szyfrowania z autentykacją (AEAD). Obsługuje klucz 128-bitowy.",
     "iconName": "lock"
   }
 ]
