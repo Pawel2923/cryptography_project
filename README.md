@@ -2,7 +2,7 @@
 
 Aplikacja okienkowa stworzona w technologii **Electron** (z wykorzystaniem **React** i **TypeScript**) do szyfrowania i deszyfrowania tekstu oraz plików tekstowych.
 Projekt stanowi bazę do dalszej rozbudowy o kolejne algorytmy kryptograficzne.
-Zaimplementowane algorytmy: **szyfr Cezara**, **szyfr Vigenere'a**, **szyfr z Kluczem Bieżącym (Running Key Cipher)** oraz **AES-GCM**.
+Zaimplementowane algorytmy: **szyfr Cezara**, **szyfr Vigenere'a**, **szyfr z Kluczem Bieżącym (Running Key Cipher)**, **AES-GCM** oraz **RSA (bez paddingu)**.
 
 ---
 
@@ -130,6 +130,40 @@ Deszyfrowanie:
   Weryfikacja: Tag autentykacji
   Wynik:       TAJNA WIADOMOSC (jeśli weryfikacja się powiodła)
 ```
+
+---
+
+## RSA (bez paddingu)
+
+Implementacja klasycznego RSA działająca na plikach tekstowych. Zgodnie z wymaganiami projektowymi **nie stosuje paddingu**, dlatego wiadomość musi być mniejsza od modułu `n` (najlepiej krótkie bloki tekstu). Szyfrogram zapisywany jest w postaci ciągu heksadecymalnego, co ułatwia jego przenoszenie między plikami.
+
+### Wymagania dotyczące klucza
+
+- Klucz przekazywany do modułu Rust powinien być obiektem JSON zawierającym co najmniej pole `n` oraz:
+  - `e` – jeśli wykonujemy szyfrowanie (klucz publiczny),
+  - `d` – jeśli wykonujemy deszyfrowanie (klucz prywatny).
+- JSON można przekazać bezpośrednio jako parametr lub wskazać ścieżkę do pliku `.json` zawierającego taki obiekt.
+- Liczby mogą być zapisane dziesiętnie lub szesnastkowo (`0x...`).
+
+Przykładowa struktura klucza:
+
+```json
+{
+  "n": "0xc8f3...",
+  "e": "65537",
+  "d": "0x1234..."
+}
+```
+
+Do generowania pary kluczy można wykorzystać pomocniczą funkcję `generate_keypair` (Rust) lub wywołać eksportowany do Electron'a interfejs `generate_rsa_keypair(bits: u32)` – oba warianty zwracają strukturę JSON z kluczem publicznym i prywatnym. Pamiętaj, że wygenerowany moduł musi być większy niż reprezentacja szyfrowanego tekstu w kodowaniu UTF-8.
+
+### Przebieg pracy algorytmu
+
+1. **Szyfrowanie** – tekst jawny jest zamieniany na liczbę (`BigUint`) i podnoszony do potęgi `e` modulo `n`. Wynik zapisywany jest do pliku z sufiksem `_encrypted` w formacie hex.
+2. **Deszyfrowanie** – szyfrogram jest wczytywany z pliku, oczyszczany z białych znaków, a następnie potęgowany do `d` modulo `n`. Wynik zapisywany jest do pliku z sufiksem `_decrypted`.
+3. **Brak paddingu** – aplikacja nie dzieli danych na bloki ani nie stosuje OAEP. Przy większych wiadomościach należy samemu dzielić dane i operować na wielu plikach/blokach.
+
+> **Uwaga:** RSA jest wrażliwe na rozmiar danych i brak paddingu – rozwiązanie ma charakter edukacyjny. Do produkcyjnych scenariuszy zaleca się hybrydę (RSA + AES) wraz z odpowiednim wypełnieniem.
 
 ---
 
