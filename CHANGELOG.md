@@ -7,6 +7,28 @@ a projekt stosuje się do [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ---
 
+## [1.3.0] - 2025-11-17
+
+### Dodano
+
+#### Frontend (Renderer)
+
+- **Komponent RSA**: Interfejs do wklejania/edycji kluczy w formacie JSON z walidacją pól `n`, `e`, `d` zależnie od operacji
+- **Obsługa schowka i plików**: Przyciski do wklejania klucza bezpośrednio ze schowka oraz wczytywania go z pliku `.json`
+- **Generator i zapisywanie kluczy**: Możliwość generowania pary kluczy z poziomu UI (różne długości bitowe) oraz zapis wygenerowanych/zmodyfikowanych kluczy do pliku JSON
+
+#### API (Proces Główny)
+
+- **Kanały IPC dla RSA**: Nowe procedury `rsa:generateKeypair` i `rsa:saveKey`, które delegują generowanie oraz zapisywanie kluczy do modułu Rust i systemu plików
+
+#### Rust Crypto (Natywny Moduł)
+
+- **Implementacja RSA**: Klasyczny algorytm RSA (bez paddingu) z obsługą plików, walidacją kluczy oraz konwersją szyfrogramów do/z formatu hex
+- **Generator kluczy RSA**: Funkcja `generate_rsa_keypair` dostępna przez N-API, wykorzystująca testy pierwszości Miller-Rabina i odwrotność modularną
+- **Rozszerzony adapter**: Obsługa algorytmu „rsa” w `AlgorithmAdapter` wraz z nowymi zależnościami `num-bigint`, `num-traits`, `serde_json`
+
+---
+
 ## [1.2.0] - 2025-11-03
 
 ### Dodano
