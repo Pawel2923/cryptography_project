@@ -26,6 +26,7 @@ declare global {
       }
       rsa: {
         generateKeypair: (bits: number) => Promise<Result<string, string>>
+        saveKey: (payload: string, defaultName?: string) => Promise<Result<boolean, string>>
       }
     }
   }

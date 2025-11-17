@@ -15,7 +15,9 @@ const api = {
     preview: (filePath?: string) => ipcRenderer.invoke('file:preview', filePath)
   },
   rsa: {
-    generateKeypair: (bits: number) => ipcRenderer.invoke('rsa:generateKeypair', bits)
+    generateKeypair: (bits: number) => ipcRenderer.invoke('rsa:generateKeypair', bits),
+    saveKey: (payload: string, defaultName?: string) =>
+      ipcRenderer.invoke('rsa:saveKey', payload, defaultName)
   }
 }
 

@@ -92,6 +92,7 @@ export default function RSA({
   const [bitLength, setBitLength] = useState(512)
   const [generatorMessage, setGeneratorMessage] = useState<string | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
   const { readLastCopiedText } = useClipboard()
 
   useEffect(() => {
@@ -189,6 +190,42 @@ export default function RSA({
     }
   }
 
+  const saveKeyToFile = async (): Promise<void> => {
+    if (!window.api?.rsa?.saveKey) {
+      setGeneratorMessage('Zapisywanie kluczy nie jest dostępne w tej wersji aplikacji.')
+      return
+    }
+
+    const payload = keyValue.trim()
+    if (!payload) {
+      setValidationMessage('Brak danych klucza do zapisania.')
+      return
+    }
+
+    const suggestedName =
+      operation === 'encrypt'
+        ? 'rsa-public-key.json'
+        : operation === 'decrypt'
+          ? 'rsa-private-key.json'
+          : 'rsa-keypair.json'
+
+    setIsSaving(true)
+    setGeneratorMessage(null)
+    try {
+      const response = await window.api.rsa.saveKey(payload, suggestedName)
+      if (response.ok) {
+        setGeneratorMessage('Zapisano klucz w pliku JSON.')
+      } else {
+        setValidationMessage(response.error || 'Nie udało się zapisać klucza RSA.')
+      }
+    } catch (error) {
+      console.error('Nie udało się zapisać klucza RSA:', error)
+      setValidationMessage('Wystąpił błąd podczas zapisywania klucza RSA.')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
   const requirementMessage =
     operation === 'encrypt'
       ? 'Do szyfrowania potrzebujesz modułu "n" oraz eksponenta publicznego "e".'
@@ -250,6 +287,24 @@ export default function RSA({
         </div>
         <p className="text-xs text-muted-foreground mt-2">
           Klucze są generowane lokalnie i zawierają zarówno część publiczną, jak i prywatną.
+        </p>
+      </Field>
+      <Field className="text-left">
+        <FieldLabel htmlFor="rsa-save-key">Zapisz klucz w formacie JSON</FieldLabel>
+        <div className="flex flex-col gap-2 md:flex-row md:items-center">
+          <Button
+            id="rsa-save-key"
+            type="button"
+            variant="outline"
+            onClick={saveKeyToFile}
+            disabled={isSaving || keyValue.trim().length === 0}
+          >
+            {isSaving ? 'Zapisywanie...' : 'Zapisz klucz jako JSON'}
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground mt-2">
+          Użyj przycisku, aby pobrać aktualny klucz (np. wygenerowany lub zmodyfikowany) do pliku
+          JSON.
         </p>
       </Field>
       {validationMessage && <p className="text-destructive">{validationMessage}</p>}

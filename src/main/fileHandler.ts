@@ -222,4 +222,42 @@ export function setupFileHandlers(app: Electron.App): void {
       }
     }
   )
+
+  ipcMain.handle(
+    'rsa:saveKey',
+    async (_event, payload: string, defaultName?: string): Promise<Result<boolean, string>> => {
+      try {
+        const trimmed = typeof payload === 'string' ? payload.trim() : ''
+        if (!trimmed) {
+          return err('Brak danych klucza do zapisania')
+        }
+
+        let normalized: unknown
+        try {
+          normalized = JSON.parse(trimmed)
+        } catch (error) {
+          console.error('Invalid RSA key JSON:', error)
+          return err('Klucz musi być poprawnym JSON-em')
+        }
+
+        const { dialog } = require('electron')
+        const { canceled, filePath } = await dialog.showSaveDialog({
+          defaultPath: defaultName || 'rsa-keypair.json',
+          filters: [{ name: 'JSON', extensions: ['json'] }]
+        })
+
+        if (canceled || !filePath) {
+          return err('Operacja zapisu została anulowana')
+        }
+
+        const jsonString = JSON.stringify(normalized, null, 2)
+        await fs.writeFile(filePath, jsonString, 'utf-8')
+
+        return ok(true)
+      } catch (error) {
+        console.error('Error saving RSA key:', error)
+        return err('Nie udało się zapisać klucza RSA')
+      }
+    }
+  )
 }
