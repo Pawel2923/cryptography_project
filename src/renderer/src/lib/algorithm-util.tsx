@@ -2,6 +2,7 @@ import algorithms from '@renderer/assets/algorithms.json'
 import AES from '@renderer/components/algorithm/AES'
 import CaesarCipher from '@renderer/components/algorithm/CaesarCipher'
 import { CipherProps } from '@renderer/components/algorithm/cipher-props'
+import RSA from '@renderer/components/algorithm/RSA'
 import RunningKeyCipher from '@renderer/components/algorithm/RunningKeyCipher'
 import VigenereCipher from '@renderer/components/algorithm/VigenereCipher'
 import { iconMap } from '@renderer/lib/icon-map'
@@ -43,6 +44,8 @@ export const getAlgorithmComponent = (
       return <RunningKeyCipher {...props} />
     case 'aes-gcm':
       return <AES {...props} />
+    case 'rsa':
+      return <RSA {...props} />
     default:
       return undefined
   }
