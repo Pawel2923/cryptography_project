@@ -1,4 +1,5 @@
 use crate::algorithms::caesar::CaesarCipher;
+use crate::algorithms::rsa::RsaCipher;
 use crate::algorithms::vigenere::VigenereCipher;
 use crate::error::CryptoError;
 use crate::traits::Algorithm;
@@ -18,6 +19,10 @@ impl AlgorithmAdapter {
             }
             "vigenere-cipher" => {
                 let cipher = VigenereCipher::new(&key)?;
+                cipher.encrypt(&file_path)
+            }
+            "rsa" => {
+                let cipher = RsaCipher::new(&key)?;
                 cipher.encrypt(&file_path)
             }
             "running-key-cipher" => {
@@ -45,6 +50,10 @@ impl AlgorithmAdapter {
             }
             "vigenere-cipher" => {
                 let cipher = VigenereCipher::new(&key)?;
+                cipher.decrypt(&file_path)
+            }
+            "rsa" => {
+                let cipher = RsaCipher::new(&key)?;
                 cipher.decrypt(&file_path)
             }
             "running-key-cipher" => {

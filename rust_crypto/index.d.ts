@@ -3,3 +3,5 @@
 export declare function decrypt(filePath: string, key: string, algorithm: string): string
 
 export declare function encrypt(filePath: string, key: string, algorithm: string): string
+
+export declare function generateRsaKeypair(bits: number): string
