@@ -1,5 +1,6 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
 import { Result } from '@shared/result-util'
+import type { ProcessOptions } from 'src/main/FileStore'
 
 type FileData = {
   name: string
@@ -22,6 +23,9 @@ declare global {
         clear: () => Promise<Result<boolean, string>>
         download: (filePath?: string) => Promise<Result<boolean, string>>
         preview: (filePath?: string) => Promise<Result<boolean, string>>
+      }
+      rsa: {
+        generateKeypair: (bits: number) => Promise<Result<string, string>>
       }
     }
   }

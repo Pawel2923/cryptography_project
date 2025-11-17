@@ -9,8 +9,9 @@ const require = createRequire(import.meta.url)
 const rustCrypto = require('../../rust_crypto/index.node') as {
   encrypt: (filepath: string, key: string, algorithm: string) => string
   decrypt: (filePath: string, key: string, algorithm: string) => string
+  generateRsaKeypair: (bits: number) => string
 }
-const { encrypt, decrypt } = rustCrypto
+const { encrypt, decrypt, generateRsaKeypair } = rustCrypto
 
 export function setupFileHandlers(app: Electron.App): void {
   ipcMain.handle(
@@ -199,6 +200,25 @@ export function setupFileHandlers(app: Electron.App): void {
       } catch (error) {
         console.error('Error previewing file:', error)
         return err('Nie udało się wyświetlić podglądu pliku')
+      }
+    }
+  )
+
+  ipcMain.handle(
+    'rsa:generateKeypair',
+    async (_event, bits: number): Promise<Result<string, string>> => {
+      try {
+        const numericBits = Number.isFinite(bits) ? Math.floor(bits) : NaN
+        if (!Number.isFinite(numericBits) || numericBits < 16) {
+          return err('Długość klucza RSA musi być liczbą większą lub równą 16.')
+        }
+
+        const safeBits = Math.max(16, Math.min(8192, numericBits))
+        const payload = generateRsaKeypair(safeBits)
+        return ok(payload)
+      } catch (error) {
+        console.error('Error generating RSA keypair:', error)
+        return err('Nie udało się wygenerować kluczy RSA')
       }
     }
   )

@@ -13,6 +13,9 @@ const api = {
     clear: () => ipcRenderer.invoke('file:clear'),
     download: (filePath?: string) => ipcRenderer.invoke('file:download', filePath),
     preview: (filePath?: string) => ipcRenderer.invoke('file:preview', filePath)
+  },
+  rsa: {
+    generateKeypair: (bits: number) => ipcRenderer.invoke('rsa:generateKeypair', bits)
   }
 }
 

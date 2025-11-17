@@ -20,5 +20,11 @@
     "name": "AES-GCM",
     "description": "Advanced Encryption Standard w trybie GCM (Galois/Counter Mode) - symetryczny algorytm szyfrowania z autentykacją (AEAD). Obsługuje klucz 128-bitowy.",
     "iconName": "lock"
+  },
+  {
+    "id": "rsa",
+    "name": "RSA",
+    "description": "Asymetryczny algorytm szyfrowania, który wykorzystuje parę kluczy: publiczny do szyfrowania i prywatny do odszyfrowywania.",
+    "iconName": "key"
   }
 ]

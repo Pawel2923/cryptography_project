@@ -70,6 +70,7 @@ export default function AlgorithmPage({
 
   const mappedComponent = getAlgorithmComponent(algorithm.id, {
     description: algorithm.description,
+    operation,
     setKey,
     setIsValid
   })
