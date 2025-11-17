@@ -258,6 +258,11 @@ export default function RSA({
           onChange={changeHandler}
           className="h-40 font-mono max-w-[90vw]"
         />
+        <p className="text-xs text-muted-foreground mt-2">
+          Obsługiwane są oba formaty: płaski obiekt{' '}
+          <code>{'{ "n": "...", "e": "...", "d": "..." }'}</code> oraz wynik generatora{' '}
+          <code>{'{ "public": { ... }, "private": { ... } }'}</code>.
+        </p>
       </Field>
       <Field className="text-left">
         <FieldLabel htmlFor="rsa-key-file">Załaduj klucz z pliku JSON</FieldLabel>
