@@ -133,9 +133,9 @@ Deszyfrowanie:
 
 ---
 
-## RSA (bez paddingu)
+## RSA
 
-Implementacja klasycznego RSA działająca na plikach tekstowych. Zgodnie z wymaganiami projektowymi **nie stosuje paddingu**, dlatego wiadomość musi być mniejsza od modułu `n` (najlepiej krótkie bloki tekstu). Szyfrogram zapisywany jest w postaci ciągu heksadecymalnego, co ułatwia jego przenoszenie między plikami.
+Implementacja klasycznego RSA działająca na plikach tekstowych. Program nie stosuje paddingu, dlatego wiadomość musi być mniejsza od modułu `n`. Szyfrogram zapisywany jest w postaci ciągu heksadecymalnego, co ułatwia jego przenoszenie między plikami.
 
 ### Wymagania dotyczące klucza
 
@@ -155,15 +155,12 @@ Przykładowa struktura klucza:
 }
 ```
 
-Do generowania pary kluczy można wykorzystać pomocniczą funkcję `generate_keypair` (Rust) lub wywołać eksportowany do Electron'a interfejs `generate_rsa_keypair(bits: u32)` – oba warianty zwracają strukturę JSON z kluczem publicznym i prywatnym. Pamiętaj, że wygenerowany moduł musi być większy niż reprezentacja szyfrowanego tekstu w kodowaniu UTF-8.
+Do generowania pary kluczy można wykorzystać pomocniczą funkcję `generate_keypair` lub wywołać eksportowany do Electron'a interfejs `generate_rsa_keypair(bits: u32)` – oba warianty zwracają strukturę JSON z kluczem publicznym i prywatnym.
 
 ### Przebieg pracy algorytmu
 
 1. **Szyfrowanie** – tekst jawny jest zamieniany na liczbę (`BigUint`) i podnoszony do potęgi `e` modulo `n`. Wynik zapisywany jest do pliku z sufiksem `_encrypted` w formacie hex.
 2. **Deszyfrowanie** – szyfrogram jest wczytywany z pliku, oczyszczany z białych znaków, a następnie potęgowany do `d` modulo `n`. Wynik zapisywany jest do pliku z sufiksem `_decrypted`.
-3. **Brak paddingu** – aplikacja nie dzieli danych na bloki ani nie stosuje OAEP. Przy większych wiadomościach należy samemu dzielić dane i operować na wielu plikach/blokach.
-
-> **Uwaga:** RSA jest wrażliwe na rozmiar danych i brak paddingu – rozwiązanie ma charakter edukacyjny. Do produkcyjnych scenariuszy zaleca się hybrydę (RSA + AES) wraz z odpowiednim wypełnieniem.
 
 ---
 
