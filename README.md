@@ -211,7 +211,7 @@ npm run build:mac   # macOS
 npm run build:linux # Linux
 ```
 
-Gotowa aplikacja pojawi się w folderze `release/`.
+Gotowy instalator aplikacji pojawi się w folderze `release/`.
 
 ## Architektura
 

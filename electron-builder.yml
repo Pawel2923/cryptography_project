@@ -1,7 +1,8 @@
 appId: com.electron.app
-productName: cryptography_project
+productName: Szyfrowanie i Deszyfrowanie
 directories:
   buildResources: build
+  output: release
 files:
   - '!**/.vscode/*'
   - '!src/*'
@@ -12,23 +13,24 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: cryptography_project
+  icon: build/icon.ico
+  executableName: cryptography-project
 nsis:
-  artifactName: ${name}-${version}-setup.${ext}
+  artifactName: cryptography-project-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
 mac:
+  icon: build/icon.icns
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
-    - NSCameraUsageDescription: Application requests access to the device's camera.
-    - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
   notarize: false
 dmg:
-  artifactName: ${name}-${version}.${ext}
+  artifactName: cryptography-project-${version}-setup.${ext}
 linux:
+  icon: build/icon.png
   target:
     - AppImage
     - snap
@@ -36,8 +38,5 @@ linux:
   maintainer: electronjs.org
   category: Utility
 appImage:
-  artifactName: ${name}-${version}.${ext}
+  artifactName: cryptography-project-${version}-setup.${ext}
 npmRebuild: false
-publish:
-  provider: generic
-  url: https://example.com/auto-updates
