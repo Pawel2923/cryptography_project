@@ -4,64 +4,13 @@ import { Button } from '@renderer/components/ui/button'
 import { TypographyH1 } from '@renderer/components/ui/typography'
 import { useTitle } from '@renderer/hooks/useTitle'
 import { ArrowDownToLine, ExternalLink } from 'lucide-react'
-import { useNavigate } from 'react-router'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import LogsDialog from '@renderer/components/LogsDialog'
+import { useResult } from '@renderer/hooks/useResult'
 
 export default function ResultPage(): React.ReactNode {
   useTitle('Wynik operacji')
-  const navigate = useNavigate()
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
-
-  const downloadResult = useCallback(async (): Promise<void> => {
-    try {
-      setErrorMessage(null)
-      const download = await window.api.file.download()
-      if (download.ok) {
-        console.log('File downloaded successfully')
-      } else {
-        const message = download.error || 'Nie udało się pobrać pliku'
-        console.error('Error downloading file:', message)
-        setErrorMessage(message)
-      }
-    } catch (error) {
-      console.error('Error downloading result:', error)
-      setErrorMessage('Wystąpił nieoczekiwany błąd podczas pobierania pliku')
-    }
-  }, [])
-
-  const previewResult = useCallback(async (): Promise<void> => {
-    try {
-      setErrorMessage(null)
-      const preview = await window.api.file.preview()
-      if (!preview.ok) {
-        const message = preview.error || 'Nie udało się wyświetlić podglądu pliku'
-        console.error('Error previewing file:', message)
-        setErrorMessage(message)
-      } else {
-        console.log('File previewed successfully')
-      }
-    } catch (error) {
-      console.error('Error previewing result:', error)
-      setErrorMessage('Wystąpił nieoczekiwany błąd podczas wyświetlania podglądu')
-    }
-  }, [])
-
-  const clearFile = useCallback(async (): Promise<void> => {
-    try {
-      setErrorMessage(null)
-      await window.api.file.clear()
-      console.log('File cleared successfully')
-
-      await window.api.logs.clear()
-      console.log('Logs cleared successfully')
-
-      navigate('/')
-    } catch (error) {
-      console.error('Error clearing file:', error)
-      setErrorMessage('Wystąpił nieoczekiwany błąd podczas czyszczenia pliku')
-    }
-  }, [navigate])
+  const { downloadResult, previewResult, clearFile, errorMessage } = useResult()
 
   useEffect(() => {
     const keyDownHandler = (event: KeyboardEvent): void => {
