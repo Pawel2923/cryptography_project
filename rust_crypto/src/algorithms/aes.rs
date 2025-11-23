@@ -3,6 +3,7 @@ use crate::algorithms::aes_helpers::{gmul, rot_word, sub_word};
 use crate::error::CryptoError;
 use crate::traits::Algorithm;
 use crate::utils::file_handler;
+use crate::utils::logger::{log, LogLevel};
 use rand::Rng;
 
 pub type Block = [u8; BLOCK_SIZE];
@@ -30,8 +31,20 @@ impl AesCipher {
 
 impl Algorithm for AesCipher {
     fn encrypt(&self, file_path: &str) -> Result<String, crate::error::CryptoError> {
+        log(
+            LogLevel::INFO,
+            "AES-GCM",
+            &format!("Rozpoczynanie szyfrowania AES-GCM dla pliku: {}", file_path),
+        );
+
         let text =
             std::fs::read(&file_path).map_err(|e| CryptoError::FileReadError(e.to_string()))?;
+
+        log(
+            LogLevel::INFO,
+            "AES-GCM",
+            &format!("Wczytano plik, rozmiar: {} bajtów", text.len()),
+        );
 
         let filename = std::path::Path::new(file_path)
             .file_name()
@@ -49,12 +62,33 @@ impl Algorithm for AesCipher {
             file_handler::create_output_path_with_suffix(file_path, "_encrypted");
         std::fs::write(&encrypted_path_str, &encrypted_text)
             .map_err(|e| CryptoError::FileWriteError(e.to_string()))?;
+
+        log(
+            LogLevel::INFO,
+            "AES-GCM",
+            &format!(
+                "Szyfrowanie zakończone. Zapisano do: {}",
+                encrypted_path_str
+            ),
+        );
         Ok(encrypted_path_str)
     }
 
     fn decrypt(&self, file_path: &str) -> Result<String, crate::error::CryptoError> {
+        log(
+            LogLevel::INFO,
+            "AES-GCM",
+            &format!("Rozpoczynanie deszyfrowania AES-GCM dla pliku: {}", file_path),
+        );
+
         let text = std::fs::read_to_string(&file_path)
             .map_err(|e| CryptoError::FileReadError(e.to_string()))?;
+
+        log(
+            LogLevel::INFO,
+            "AES-GCM",
+            &format!("Wczytano plik, rozmiar: {} bajtów", text.len()),
+        );
 
         let encrypted_bytes: Vec<u8> = (0..text.len())
             .step_by(2)
@@ -97,6 +131,15 @@ impl Algorithm for AesCipher {
             file_handler::create_output_path_with_suffix(file_path, "_decrypted");
         std::fs::write(&decrypted_path_str, &decrypted_text)
             .map_err(|e| CryptoError::FileWriteError(e.to_string()))?;
+
+        log(
+            LogLevel::INFO,
+            "AES-GCM",
+            &format!(
+                "Deszyfrowanie zakończone. Zapisano do: {}",
+                decrypted_path_str
+            ),
+        );
         Ok(decrypted_path_str)
     }
 }
@@ -309,10 +352,12 @@ fn constant_time_eq(a: &[u8], b: &[u8]) -> bool {
 }
 
 pub fn aes_gcm_encrypt(plaintext: &[u8], aad: &[u8], key: &[u8]) -> Vec<u8> {
+    log(LogLevel::INFO, "AES-GCM", "Generowanie nonce...");
     let mut rng = rand::thread_rng();
     let mut nonce = [0u8; 12];
     rng.fill(&mut nonce);
 
+    log(LogLevel::INFO, "AES-GCM", "Rozszerzanie klucza...");
     let round_keys = key_expansion(key);
 
     let zero_block = [0u8; 16];
@@ -327,6 +372,7 @@ pub fn aes_gcm_encrypt(plaintext: &[u8], aad: &[u8], key: &[u8]) -> Vec<u8> {
     let mut ciphertext = Vec::new();
     let mut current_counter = counter_block;
 
+    log(LogLevel::INFO, "AES-GCM", "Szyfrowanie bloków...");
     for chunk in plaintext.chunks(BLOCK_SIZE) {
         let keystream = aes_encrypt_block(current_counter, &round_keys);
 
@@ -337,6 +383,7 @@ pub fn aes_gcm_encrypt(plaintext: &[u8], aad: &[u8], key: &[u8]) -> Vec<u8> {
         inc32(&mut current_counter);
     }
 
+    log(LogLevel::INFO, "AES-GCM", "Obliczanie GHASH...");
     let s = ghash(h, aad, &ciphertext);
 
     let ej0 = aes_encrypt_block(j0, &round_keys);
@@ -362,6 +409,7 @@ pub fn aes_gcm_decrypt(data: &[u8], aad: &[u8], key: &[u8]) -> Result<Vec<u8>, &
     let ciphertext = &data[12..tag_start];
     let received_tag = &data[tag_start..];
 
+    log(LogLevel::INFO, "AES-GCM", "Rozszerzanie klucza...");
     let round_keys = key_expansion(key);
 
     let zero_block = [0u8; 16];
@@ -377,9 +425,15 @@ pub fn aes_gcm_decrypt(data: &[u8], aad: &[u8], key: &[u8]) -> Result<Vec<u8>, &
     let expected_tag_value = ej0_value ^ s;
     let expected_tag = u128_to_bytes(expected_tag_value);
 
+    log(LogLevel::INFO, "AES-GCM", "Weryfikacja tagu GCM...");
     if !constant_time_eq(received_tag, &expected_tag) {
         return Err("Weryfikacja autentyczności nie powiodła się");
     }
+    log(
+        LogLevel::INFO,
+        "AES-GCM",
+        "Tag poprawny. Deszyfrowanie bloków...",
+    );
 
     let mut counter_block = j0;
     inc32(&mut counter_block);

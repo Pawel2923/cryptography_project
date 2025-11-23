@@ -1,3 +1,4 @@
+use crate::utils::logger::{LogLevel, log};
 use crate::{error::CryptoError, traits::Algorithm, utils::file_handler};
 use num_bigint::{BigInt, BigUint, RandBigInt, Sign};
 use num_integer::Integer;
@@ -93,9 +94,22 @@ impl RsaCipher {
 
 impl Algorithm for RsaCipher {
     fn encrypt(&self, file_path: &str) -> Result<String, CryptoError> {
+        log(
+            LogLevel::INFO,
+            "RSA",
+            &format!("Rozpoczynanie szyfrowania RSA dla pliku: {}", file_path),
+        );
+
+        log(LogLevel::INFO, "RSA", "Wczytywanie klucza publicznego...");
         let (public_exp, modulus) = self.require_public_components()?;
 
         let plaintext = file_handler::read_file(file_path)?;
+        log(
+            LogLevel::INFO,
+            "RSA",
+            &format!("Wczytano plik, rozmiar: {} bajtów", plaintext.len()),
+        );
+
         let message = BigUint::from_bytes_be(plaintext.as_bytes());
 
         if message >= *modulus {
@@ -104,18 +118,41 @@ impl Algorithm for RsaCipher {
             ));
         }
 
+        log(
+            LogLevel::INFO,
+            "RSA",
+            "Szyfrowanie (potęgowanie modularne)...",
+        );
         let ciphertext = encrypt_block(&message, public_exp, modulus);
         let cipher_hex = format!("{:x}", ciphertext);
 
         let output_path = file_handler::create_output_path_with_suffix(file_path, "_encrypted");
         file_handler::write_file(&output_path, &cipher_hex)?;
+        log(
+            LogLevel::INFO,
+            "RSA",
+            &format!("Szyfrowanie zakończone. Zapisano do: {}", output_path),
+        );
         Ok(output_path)
     }
 
     fn decrypt(&self, file_path: &str) -> Result<String, CryptoError> {
+        log(
+            LogLevel::INFO,
+            "RSA",
+            &format!("Rozpoczynanie deszyfrowania RSA dla pliku: {}", file_path),
+        );
+
+        log(LogLevel::INFO, "RSA", "Wczytywanie klucza prywatnego...");
         let (private_exp, modulus) = self.require_private_components()?;
 
         let ciphertext_hex = file_handler::read_file(file_path)?;
+        log(
+            LogLevel::INFO,
+            "RSA",
+            &format!("Wczytano plik, rozmiar: {} bajtów", ciphertext_hex.len()),
+        );
+
         let cleaned: String = ciphertext_hex
             .chars()
             .filter(|c| !c.is_whitespace())
@@ -138,6 +175,11 @@ impl Algorithm for RsaCipher {
             ));
         }
 
+        log(
+            LogLevel::INFO,
+            "RSA",
+            "Deszyfrowanie (potęgowanie modularne)...",
+        );
         let message = decrypt_block(&ciphertext, private_exp, modulus);
         let message_bytes = message.to_bytes_be();
         let plaintext = String::from_utf8(message_bytes).map_err(|_| {
@@ -148,6 +190,11 @@ impl Algorithm for RsaCipher {
 
         let output_path = file_handler::create_output_path_with_suffix(file_path, "_decrypted");
         file_handler::write_file(&output_path, &plaintext)?;
+        log(
+            LogLevel::INFO,
+            "RSA",
+            &format!("Deszyfrowanie zakończone. Zapisano do: {}", output_path),
+        );
         Ok(output_path)
     }
 }
@@ -202,6 +249,12 @@ fn decrypt_block(ciphertext: &BigUint, exponent: &BigUint, modulus: &BigUint) ->
 }
 
 pub fn generate_keypair(bits: usize) -> Result<RsaKeyPair, CryptoError> {
+    log(
+        LogLevel::INFO,
+        "RSA",
+        &format!("Generowanie pary kluczy RSA ({} bitów)...", bits),
+    );
+
     if bits < 16 {
         return Err(CryptoError::InvalidKey(
             "Długość klucza RSA musi wynosić co najmniej 16 bitów".to_string(),
@@ -209,6 +262,11 @@ pub fn generate_keypair(bits: usize) -> Result<RsaKeyPair, CryptoError> {
     }
 
     loop {
+        log(
+            LogLevel::INFO,
+            "RSA",
+            "Generowanie liczb pierwszych p i q...",
+        );
         let p = gen_prime(bits);
         let q = gen_prime(bits);
 
@@ -216,6 +274,7 @@ pub fn generate_keypair(bits: usize) -> Result<RsaKeyPair, CryptoError> {
             continue;
         }
 
+        log(LogLevel::INFO, "RSA", "Obliczanie n, phi, e...");
         let n = &p * &q;
         let phi = (&p - BigUint::one()) * (&q - BigUint::one());
         let e = BigUint::from(DEFAULT_E);
@@ -227,6 +286,11 @@ pub fn generate_keypair(bits: usize) -> Result<RsaKeyPair, CryptoError> {
         let e_bi = BigInt::from_bytes_be(Sign::Plus, &e.to_bytes_be());
         let phi_bi = BigInt::from_bytes_be(Sign::Plus, &phi.to_bytes_be());
 
+        log(
+            LogLevel::INFO,
+            "RSA",
+            "Obliczanie d (odwrotność modularna)...",
+        );
         if let Some(d_bi) = modinv(&e_bi, &phi_bi) {
             if d_bi.is_zero() {
                 continue;
@@ -241,6 +305,7 @@ pub fn generate_keypair(bits: usize) -> Result<RsaKeyPair, CryptoError> {
             };
             let private = RsaPrivateKey { d, n: n.clone() };
 
+            log(LogLevel::INFO, "RSA", "Klucze wygenerowane pomyślnie.");
             return Ok(RsaKeyPair { public, private });
         }
     }

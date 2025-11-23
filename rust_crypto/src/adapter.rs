@@ -3,6 +3,7 @@ use crate::algorithms::rsa::RsaCipher;
 use crate::algorithms::vigenere::VigenereCipher;
 use crate::error::CryptoError;
 use crate::traits::Algorithm;
+use crate::utils::logger::{log, LogLevel};
 
 pub struct AlgorithmAdapter;
 
@@ -12,6 +13,7 @@ impl AlgorithmAdapter {
         key: String,
         algorithm: String,
     ) -> Result<String, CryptoError> {
+        log(LogLevel::INFO, "Adapter", &format!("Wybrano algorytm szyfrowania: {}", algorithm));
         match algorithm.as_str() {
             "caesar-cipher" => {
                 let cipher = CaesarCipher::new(&key)?;
@@ -43,6 +45,7 @@ impl AlgorithmAdapter {
         key: String,
         algorithm: String,
     ) -> Result<String, CryptoError> {
+        log(LogLevel::INFO, "Adapter", &format!("Wybrano algorytm deszyfrowania: {}", algorithm));
         match algorithm.as_str() {
             "caesar-cipher" => {
                 let cipher = CaesarCipher::new(&key)?;

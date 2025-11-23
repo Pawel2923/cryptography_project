@@ -1,4 +1,5 @@
 use crate::{error::CryptoError, traits::Algorithm, utils::file_handler};
+use crate::utils::logger::{log, LogLevel};
 
 pub struct VigenereCipher {
     key: String,
@@ -7,9 +8,13 @@ pub struct VigenereCipher {
 impl VigenereCipher {
     pub fn new(key: &str) -> Result<Self, CryptoError> {
         if key.is_empty() || !key.chars().any(|c| c.is_ascii_alphabetic()) {
-            return Err(CryptoError::InvalidKey(
-                "Klucz musi zawierać co najmniej jedną literę alfabetu".to_string(),
-            ));
+            let msg = "Klucz musi zawierać co najmniej jedną literę alfabetu".to_string();
+            log(
+                LogLevel::ERROR,
+                "Vigenere",
+                &format!("Nieprawidłowy klucz: {}", msg),
+            );
+            return Err(CryptoError::InvalidKey(msg));
         }
 
         Ok(VigenereCipher {
@@ -25,24 +30,92 @@ pub enum Operation {
 
 impl Algorithm for VigenereCipher {
     fn encrypt(&self, file_path: &str) -> Result<String, CryptoError> {
-        let text = file_handler::read_file(file_path)?;
+        log(
+            LogLevel::INFO,
+            "Vigenere",
+            &format!("Rozpoczynanie szyfrowania Vigenere'a dla pliku: {}", file_path),
+        );
+        let text = file_handler::read_file(file_path).map_err(|e| {
+            log(
+                LogLevel::ERROR,
+                "Vigenere",
+                &format!("Błąd odczytu pliku: {}", e),
+            );
+            e
+        })?;
+        log(
+            LogLevel::INFO,
+            "Vigenere",
+            &format!("Wczytano plik, rozmiar: {} bajtów", text.len()),
+        );
 
+        log(
+            LogLevel::INFO,
+            "Vigenere",
+            &format!("Klucz: {}", self.key),
+        );
         let encrypted: String = vigenere(&text, &self.key, &Operation::Encrypt);
 
         let encrypted_path_str =
             file_handler::create_output_path_with_suffix(file_path, "_encrypted");
-        file_handler::write_file(&encrypted_path_str, encrypted.as_str())?;
+        file_handler::write_file(&encrypted_path_str, encrypted.as_str()).map_err(|e| {
+            log(
+                LogLevel::ERROR,
+                "Vigenere",
+                &format!("Błąd zapisu pliku: {}", e),
+            );
+            e
+        })?;
+        log(
+            LogLevel::INFO,
+            "Vigenere",
+            &format!("Szyfrowanie zakończone. Zapisano do: {}", encrypted_path_str),
+        );
         Ok(encrypted_path_str)
     }
 
     fn decrypt(&self, file_path: &str) -> Result<String, CryptoError> {
-        let text = file_handler::read_file(file_path)?;
+        log(
+            LogLevel::INFO,
+            "Vigenere",
+            &format!("Rozpoczynanie deszyfrowania Vigenere'a dla pliku: {}", file_path),
+        );
+        let text = file_handler::read_file(file_path).map_err(|e| {
+            log(
+                LogLevel::ERROR,
+                "Vigenere",
+                &format!("Błąd odczytu pliku: {}", e),
+            );
+            e
+        })?;
+        log(
+            LogLevel::INFO,
+            "Vigenere",
+            &format!("Wczytano plik, rozmiar: {} bajtów", text.len()),
+        );
 
+        log(
+            LogLevel::INFO,
+            "Vigenere",
+            &format!("Klucz: {}", self.key),
+        );
         let decrypted: String = vigenere(&text, &self.key, &Operation::Decrypt);
 
         let decrypted_path_str =
             file_handler::create_output_path_with_suffix(file_path, "_decrypted");
-        file_handler::write_file(&decrypted_path_str, decrypted.as_str())?;
+        file_handler::write_file(&decrypted_path_str, decrypted.as_str()).map_err(|e| {
+            log(
+                LogLevel::ERROR,
+                "Vigenere",
+                &format!("Błąd zapisu pliku: {}", e),
+            );
+            e
+        })?;
+        log(
+            LogLevel::INFO,
+            "Vigenere",
+            &format!("Deszyfrowanie zakończone. Zapisano do: {}", decrypted_path_str),
+        );
         Ok(decrypted_path_str)
     }
 }

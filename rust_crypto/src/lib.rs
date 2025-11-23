@@ -12,29 +12,59 @@ use crate::utils::logger;
 
 #[napi]
 pub fn encrypt(file_path: String, key: String, algorithm: String) -> napi::Result<String> {
-    AlgorithmAdapter::encrypt(file_path, key, algorithm).map_err(|e| napi::Error::from(e))
+    match AlgorithmAdapter::encrypt(file_path, key, algorithm) {
+        Ok(result) => Ok(result),
+        Err(e) => {
+            logger::log(
+                logger::LogLevel::ERROR,
+                "Encrypt",
+                &format!("Błąd szyfrowania: {}", e),
+            );
+            Err(napi::Error::from(e))
+        }
+    }
 }
 
 #[napi]
 pub fn decrypt(file_path: String, key: String, algorithm: String) -> napi::Result<String> {
-    AlgorithmAdapter::decrypt(file_path, key, algorithm).map_err(|e| napi::Error::from(e))
+    match AlgorithmAdapter::decrypt(file_path, key, algorithm) {
+        Ok(result) => Ok(result),
+        Err(e) => {
+            logger::log(
+                logger::LogLevel::ERROR,
+                "Decrypt",
+                &format!("Błąd deszyfrowania: {}", e),
+            );
+            Err(napi::Error::from(e))
+        }
+    }
 }
 
 #[napi]
 pub fn generate_rsa_keypair(bits: u32) -> napi::Result<String> {
-    let keypair = algorithms::rsa::generate_keypair(bits as usize)?;
-    let payload = json!({
-        "public": {
-            "n": keypair.public.n.to_str_radix(10),
-            "e": keypair.public.e.to_str_radix(10)
-        },
-        "private": {
-            "n": keypair.private.n.to_str_radix(10),
-            "d": keypair.private.d.to_str_radix(10)
+    match algorithms::rsa::generate_keypair(bits as usize) {
+        Ok(keypair) => {
+            let payload = json!({
+                "public": {
+                    "n": keypair.public.n.to_str_radix(10),
+                    "e": keypair.public.e.to_str_radix(10)
+                },
+                "private": {
+                    "n": keypair.private.n.to_str_radix(10),
+                    "d": keypair.private.d.to_str_radix(10)
+                }
+            });
+            Ok(payload.to_string())
         }
-    });
-
-    Ok(payload.to_string())
+        Err(e) => {
+            logger::log(
+                logger::LogLevel::ERROR,
+                "KeyGen",
+                &format!("Błąd generowania kluczy RSA: {}", e),
+            );
+            Err(napi::Error::from(e))
+        }
+    }
 }
 
 #[napi]
