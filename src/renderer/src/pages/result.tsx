@@ -5,7 +5,7 @@ import { TypographyH1 } from '@renderer/components/ui/typography'
 import { useTitle } from '@renderer/hooks/useTitle'
 import { ArrowDownToLine, ExternalLink } from 'lucide-react'
 import { useNavigate } from 'react-router'
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import LogsDialog from '@renderer/components/LogsDialog'
 
 export default function ResultPage(): React.ReactNode {
@@ -13,7 +13,7 @@ export default function ResultPage(): React.ReactNode {
   const navigate = useNavigate()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  const downloadResult = async (): Promise<void> => {
+  const downloadResult = useCallback(async (): Promise<void> => {
     try {
       setErrorMessage(null)
       const download = await window.api.file.download()
@@ -28,9 +28,9 @@ export default function ResultPage(): React.ReactNode {
       console.error('Error downloading result:', error)
       setErrorMessage('Wystąpił nieoczekiwany błąd podczas pobierania pliku')
     }
-  }
+  }, [])
 
-  const previewResult = async (): Promise<void> => {
+  const previewResult = useCallback(async (): Promise<void> => {
     try {
       setErrorMessage(null)
       const preview = await window.api.file.preview()
@@ -45,9 +45,9 @@ export default function ResultPage(): React.ReactNode {
       console.error('Error previewing result:', error)
       setErrorMessage('Wystąpił nieoczekiwany błąd podczas wyświetlania podglądu')
     }
-  }
+  }, [])
 
-  const clearFile = async (): Promise<void> => {
+  const clearFile = useCallback(async (): Promise<void> => {
     try {
       setErrorMessage(null)
       await window.api.file.clear()
@@ -61,7 +61,27 @@ export default function ResultPage(): React.ReactNode {
       console.error('Error clearing file:', error)
       setErrorMessage('Wystąpił nieoczekiwany błąd podczas czyszczenia pliku')
     }
-  }
+  }, [navigate])
+
+  useEffect(() => {
+    const keyDownHandler = (event: KeyboardEvent): void => {
+      if (event.key === 's' && (event.ctrlKey || event.metaKey)) {
+        event.preventDefault()
+        downloadResult()
+      }
+
+      if (event.key === ' ' || event.key === 'Spacebar') {
+        event.preventDefault()
+        previewResult()
+      }
+    }
+
+    window.addEventListener('keydown', keyDownHandler)
+
+    return (): void => {
+      window.removeEventListener('keydown', keyDownHandler)
+    }
+  }, [clearFile, downloadResult, previewResult])
 
   return (
     <>
@@ -75,11 +95,15 @@ export default function ResultPage(): React.ReactNode {
           </div>
         )}
         <div className="flex gap-4">
-          <Button onClick={downloadResult}>
+          <Button onClick={downloadResult} title="Pobierz plik (Ctrl+S)">
             <ArrowDownToLine aria-hidden="true" />
             Pobierz
           </Button>
-          <Button onClick={previewResult} variant="outline">
+          <Button
+            onClick={previewResult}
+            variant="outline"
+            title="Otwórz podgląd w domyślnej aplikacji (Spacja)"
+          >
             <ExternalLink aria-hidden="true" />
             Podgląd
           </Button>

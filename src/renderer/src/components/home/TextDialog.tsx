@@ -65,6 +65,23 @@ export default function TextDialog(): React.ReactNode {
     }
   }
 
+  const keyDownHandler = (event: React.KeyboardEvent<HTMLFormElement>): void => {
+    if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+      event.preventDefault()
+      event.currentTarget.requestSubmit()
+    }
+
+    if (event.key === 'v' && (event.ctrlKey || event.metaKey)) {
+      event.preventDefault()
+      pasteBtnClickHandler()
+    }
+
+    if (event.key === 'Backspace' && (event.ctrlKey || event.metaKey)) {
+      event.preventDefault()
+      handleReset()
+    }
+  }
+
   return (
     <Dialog onOpenChange={onDialogOpenChange}>
       <DialogTrigger asChild>
@@ -74,7 +91,12 @@ export default function TextDialog(): React.ReactNode {
         <DialogHeader>
           <DialogTitle>Przetwarzanie tekstu</DialogTitle>
         </DialogHeader>
-        <form onSubmit={submitHandler} onReset={handleReset} className="grid gap-6">
+        <form
+          onSubmit={submitHandler}
+          onReset={handleReset}
+          onKeyDown={keyDownHandler}
+          className="grid gap-6"
+        >
           <FieldSet>
             <FieldGroup>
               <Field>
@@ -85,7 +107,7 @@ export default function TextDialog(): React.ReactNode {
                       variant="outline"
                       onClick={pasteBtnClickHandler}
                       aria-label="Wklej tekst ze schowka"
-                      title="Wklej ze schowka"
+                      title="Wklej ze schowka (Ctrl+V)"
                     >
                       <ClipboardPaste aria-hidden="true" />
                       <span className="sr-only">Wklej ze schowka</span>
@@ -94,7 +116,7 @@ export default function TextDialog(): React.ReactNode {
                       type="reset"
                       variant="destructive"
                       aria-label="Wyczyść pole tekstowe"
-                      title="Wyczyść pole tekstowe"
+                      title="Wyczyść pole tekstowe (Ctrl+Backspace)"
                     >
                       <Trash aria-hidden="true" />
                       <span className="sr-only">Wyczyść pole tekstowe</span>
@@ -127,7 +149,7 @@ export default function TextDialog(): React.ReactNode {
             <DialogClose asChild>
               <Button variant="outline">Anuluj</Button>
             </DialogClose>
-            <Button type="submit" disabled={hasErrors && textValue.length > 0}>
+            <Button type="submit" disabled={hasErrors && textValue.length > 0} title="Ctrl+Enter">
               Potwierdź
             </Button>
           </DialogFooter>
