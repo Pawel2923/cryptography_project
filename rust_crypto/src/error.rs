@@ -11,6 +11,7 @@ pub enum CryptoError {
     IoError(std::io::Error),
     DecryptionError(String),
     InvalidFormat(String),
+    LogError(String),
 }
 
 impl fmt::Display for CryptoError {
@@ -42,6 +43,9 @@ impl fmt::Display for CryptoError {
             }
             CryptoError::InvalidFormat(msg) => {
                 write!(f, "Nieprawidłowy format danych: {}", msg)
+            }
+            CryptoError::LogError(msg) => {
+                write!(f, "Błąd logowania: {}", msg)
             }
         }
     }
