@@ -13,7 +13,8 @@ Aplikacja umożliwia:
 - szyfrowanie i deszyfrowanie **wprowadzonego tekstu**,
 - szyfrowanie i deszyfrowanie **plików tekstowych (.txt)**,
 - zapisanie wyników do pliku lub ich podgląd bezpośrednio w interfejsie,
-- konfigurację kluczy/parametrów algorytmów (np. przesunięcie dla Cezara, klucz dla Vigenere'a).
+- konfigurację kluczy/parametrów algorytmów (np. przesunięcie dla Cezara, klucz dla Vigenere'a),
+- **przeglądanie i eksport logów operacji** – historia wszystkich wykonanych operacji kryptograficznych z możliwością eksportu.
 
 Dzięki modularnej architekturze aplikacja pozwala na łatwe dodawanie kolejnych algorytmów kryptograficznych.
 
@@ -161,6 +162,39 @@ Do generowania pary kluczy można wykorzystać pomocniczą funkcję `generate_ke
 
 1. **Szyfrowanie** – tekst jawny jest zamieniany na liczbę (`BigUint`) i podnoszony do potęgi `e` modulo `n`. Wynik zapisywany jest do pliku z sufiksem `_encrypted` w formacie hex.
 2. **Deszyfrowanie** – szyfrogram jest wczytywany z pliku, oczyszczany z białych znaków, a następnie potęgowany do `d` modulo `n`. Wynik zapisywany jest do pliku z sufiksem `_decrypted`.
+
+---
+
+## System logowania
+
+Aplikacja posiada wbudowany system logowania, który rejestruje wszystkie operacje kryptograficzne wykonywane podczas sesji.
+
+### Funkcje systemu logowania
+
+- **Przeglądanie logów** – Wyświetlanie historii wszystkich operacji szyfrowania i deszyfrowania w oknie dialogowym
+- **Kopiowanie do schowka** – Szybkie kopiowanie wszystkich logów z wizualnym potwierdzeniem
+- **Eksport do pliku** – Zapisywanie logów do pliku `.log` lub `.txt` z automatycznym timestampem w nazwie (format: `logs_YYYY-MM-DD_HH-MM-SS.log`)
+- **Automatyczne czyszczenie** – Logi są automatycznie czyszczone przy powrocie do strony głównej aplikacji
+
+### Skróty klawiszowe
+
+- **`Ctrl+L`** / **`Cmd+L`** — Otwórz okno z logami (na stronie wyników)
+- **`Ctrl+C`** / **`Cmd+C`** — Kopiuj logi do schowka (gdy okno logów jest otwarte)
+- **`Ctrl+S`** / **`Cmd+S`** — Zapisz logi do pliku (gdy okno logów jest otwarte)
+
+### Format logów
+
+Każdy wpis w logu zawiera:
+- **Timestamp** – Data i godzina operacji (format: `YYYY-MM-DD HH:MM:SS`)
+- **Poziom** – INFO, WARN lub ERROR
+- **Kontekst** – Moduł, w którym wykonano operację (np. Adapter, Encrypt, Decrypt)
+- **Wiadomość** – Opis wykonanej operacji lub błędu
+
+Przykład wpisu:
+```text
+[2025-11-23 14:30:45] [INFO] [Adapter] Wybrano algorytm szyfrowania: aes-gcm
+[2025-11-23 14:30:46] [ERROR] [Encrypt] Błąd szyfrowania: Invalid key length
+```
 
 ---
 

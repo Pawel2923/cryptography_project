@@ -7,6 +7,75 @@ a projekt stosuje się do [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ---
 
+## [1.4.0] - 2025-11-23
+
+### Dodano
+
+#### Frontend (Renderer)
+
+- **Komponent LogsDialog**: Pełny interfejs do przeglądania logów operacji z funkcjami:
+  - Wyświetlanie historii wszystkich operacji szyfrowania i deszyfrowania w bieżącej sesji
+  - Kopiowanie logów do schowka z wizualnym potwierdzeniem
+  - Eksport logów do pliku `.log` lub `.txt` z automatycznym timestampem w nazwie
+  - Obsługa stanów ładowania i błędów
+  - Responsywny layout z przewijaniem dla długich logów
+  - Czcionka monospace z zawijaniem wierszy dla czytelności
+- **Skróty klawiszowe dla logów**:
+  - `Ctrl+L` / `Cmd+L` – otwieranie okna dialogowego z logami
+  - `Ctrl+C` / `Cmd+C` – kopiowanie logów do schowka (gdy dialog jest otwarty)
+  - `Ctrl+S` / `Cmd+S` – zapisywanie logów do pliku (gdy dialog jest otwarty)
+- **Hook useLogs**: Niestandardowy hook React do zarządzania stanem logów z obsługą:
+  - Asynchronicznego pobierania logów z procesu głównego
+  - Kopiowania do schowka z 2-sekundowym timeoutem potwierdzenia
+  - Wywołania dialogu zapisu pliku
+  - Obsługi błędów i stanów ładowania
+- **Automatyczne czyszczenie logów**: Logi są automatycznie czyszczone przy powrocie do strony głównej
+- **Integracja w stronie wyników**: Przycisk „Zobacz logi operacji" dodany na stronie wyników operacji
+
+#### API (Proces Główny)
+
+- **Kanały IPC dla logów**: Nowe procedury do obsługi systemu logowania:
+  - `logs:get` – pobieranie wszystkich logów z modułu Rust
+  - `logs:clear` – czyszczenie wszystkich wpisów logów
+  - `logs:exportToFile` – eksport logów do pliku z dialogiem zapisu (domyślna nazwa: `logs_YYYY-MM-DD_HH-MM-SS.log`)
+- **Rozszerzone definicje typów**: Dodano `exportLogs` i `clearLogs` do interfejsu rustCrypto
+- **Integracja preload API**: Nowy obiekt `logs` w API preload z metodami `get`, `clear`, `exportToFile`
+
+#### Rust Crypto (Natywny Moduł)
+
+- **Moduł Logger** (`utils/logger.rs`): Kompletny system logowania z:
+  - Enum `LogLevel`: INFO, WARN, ERROR
+  - Struct `LogEntry`: timestamp, level, context, message
+  - Struct `Logger`: Thread-safe singleton z `Mutex<Vec<LogEntry>>`
+  - Funkcje:
+    - `log` – dodawanie wpisu do logu
+    - `export_to_file` – eksport do pliku z timestampem
+    - `clear` – czyszczenie wszystkich wpisów
+    - `get_logs` – pobieranie wszystkich wpisów
+- **Integracja logowania w `lib.rs`**:
+  - `export_logs()` – funkcja N-API zwracająca sformatowane logi jako string
+  - `clear_logs()` – funkcja N-API do czyszczenia wpisów logów
+  - Logowanie błędów w funkcjach `encrypt`, `decrypt`, `generate_rsa_keypair`
+- **Integracja w Adapter** (`adapter.rs`):
+  - Logowanie wyboru algorytmu dla operacji szyfrowania i deszyfrowania
+  - Format: `[timestamp] [INFO] [Adapter] Wybrano algorytm {operacji}: {nazwa}`
+- **Nowe zależności**:
+  - `chrono` – obsługa timestampów w logach
+  - `lazy_static` – inicjalizacja singletona Logger
+- **Format logów**: `[YYYY-MM-DD HH:MM:SS] [LEVEL] [Context] Message`
+
+### Ulepszone
+
+#### Frontend (Renderer)
+
+- **Strona wyników**: Dodano przycisk do przeglądania logów operacji między przyciskami akcji a przyciskiem powrotu
+
+#### API (Proces Główny)
+
+- **Definicje TypeScript**: Zaktualizowano `index.d.ts` w rust_crypto z deklaracjami `clearLogs()` i `exportLogs()`
+
+---
+
 ## [1.3.0] - 2025-11-17
 
 ### Dodano
