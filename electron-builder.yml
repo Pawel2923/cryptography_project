@@ -20,6 +20,8 @@ nsis:
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
+  createStartMenuShortcut: true
+  menuCategory: true
 mac:
   icon: build/icon.icns
   entitlementsInherit: build/entitlements.mac.plist
