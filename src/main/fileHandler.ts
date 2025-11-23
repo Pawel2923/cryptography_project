@@ -10,8 +10,10 @@ const rustCrypto = require('../../rust_crypto/index.node') as {
   encrypt: (filepath: string, key: string, algorithm: string) => string
   decrypt: (filePath: string, key: string, algorithm: string) => string
   generateRsaKeypair: (bits: number) => string
+  exportLogs: () => string
+  clearLogs: () => void
 }
-const { encrypt, decrypt, generateRsaKeypair } = rustCrypto
+const { encrypt, decrypt, generateRsaKeypair, exportLogs, clearLogs } = rustCrypto
 
 export function setupFileHandlers(app: Electron.App): void {
   ipcMain.handle(
@@ -83,12 +85,15 @@ export function setupFileHandlers(app: Electron.App): void {
       try {
         let result: string = ''
 
+        console.log(`Starting ${operation} with algorithm: ${options.algorithm}`)
         switch (operation) {
           case 'encrypt':
             result = encrypt(fileData.path, options.key, options.algorithm)
+            console.log('Encrypt completed, result:', result)
             break
           case 'decrypt':
             result = decrypt(fileData.path, options.key, options.algorithm)
+            console.log('Decrypt completed, result:', result)
             break
           default:
             console.error('Invalid operation:', operation)
@@ -260,4 +265,55 @@ export function setupFileHandlers(app: Electron.App): void {
       }
     }
   )
+
+  ipcMain.handle('logs:get', async (): Promise<Result<string, string>> => {
+    try {
+      const logs = exportLogs()
+      console.log('Logs retrieved from Rust:', logs)
+      console.log('Logs length:', logs ? logs.length : 0)
+      return ok(logs)
+    } catch (error) {
+      console.error('Error getting logs:', error)
+      return err('Nie udało się pobrać logów')
+    }
+  })
+
+  ipcMain.handle('logs:clear', async (): Promise<Result<boolean, string>> => {
+    try {
+      clearLogs()
+      return ok(true)
+    } catch (error) {
+      console.error('Error clearing logs:', error)
+      return err('Nie udało się wyczyścić logów')
+    }
+  })
+
+  ipcMain.handle('logs:export', async (): Promise<Result<boolean, string>> => {
+    try {
+      const logs = exportLogs()
+      if (!logs || logs.trim().length === 0) {
+        return err('Brak logów do zapisania')
+      }
+
+      const { dialog } = require('electron')
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
+      const { canceled, filePath } = await dialog.showSaveDialog({
+        defaultPath: `logs_${timestamp}.log`,
+        filters: [
+          { name: 'Log Files', extensions: ['log'] },
+          { name: 'Text Files', extensions: ['txt'] }
+        ]
+      })
+
+      if (canceled || !filePath) {
+        return err('Operacja zapisu została anulowana')
+      }
+
+      await fs.writeFile(filePath, logs, 'utf-8')
+      return ok(true)
+    } catch (error) {
+      console.error('Error exporting logs:', error)
+      return err('Nie udało się wyeksportować logów')
+    }
+  })
 }

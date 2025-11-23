@@ -6,6 +6,7 @@ import { useTitle } from '@renderer/hooks/useTitle'
 import { ArrowDownToLine, ExternalLink } from 'lucide-react'
 import { useNavigate } from 'react-router'
 import { useState } from 'react'
+import LogsDialog from '@renderer/components/LogsDialog'
 
 export default function ResultPage(): React.ReactNode {
   useTitle('Wynik operacji')
@@ -51,6 +52,10 @@ export default function ResultPage(): React.ReactNode {
       setErrorMessage(null)
       await window.api.file.clear()
       console.log('File cleared successfully')
+
+      await window.api.logs.clear()
+      console.log('Logs cleared successfully')
+
       navigate('/')
     } catch (error) {
       console.error('Error clearing file:', error)
@@ -79,6 +84,7 @@ export default function ResultPage(): React.ReactNode {
             Podgląd
           </Button>
         </div>
+        <LogsDialog />
         <Button onClick={clearFile} variant="destructive">
           Powróć do ekranu głównego
         </Button>

@@ -28,6 +28,11 @@ declare global {
         generateKeypair: (bits: number) => Promise<Result<string, string>>
         saveKey: (payload: string, defaultName?: string) => Promise<Result<boolean, string>>
       }
+      logs: {
+        get: () => Promise<Result<string, string>>
+        clear: () => Promise<Result<boolean, string>>
+        exportToFile: () => Promise<Result<boolean, string>>
+      }
     }
   }
 }

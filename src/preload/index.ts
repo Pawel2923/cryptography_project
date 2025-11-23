@@ -18,6 +18,11 @@ const api = {
     generateKeypair: (bits: number) => ipcRenderer.invoke('rsa:generateKeypair', bits),
     saveKey: (payload: string, defaultName?: string) =>
       ipcRenderer.invoke('rsa:saveKey', payload, defaultName)
+  },
+  logs: {
+    get: () => ipcRenderer.invoke('logs:get'),
+    clear: () => ipcRenderer.invoke('logs:clear'),
+    exportToFile: () => ipcRenderer.invoke('logs:export')
   }
 }
 
