@@ -7,6 +7,20 @@ a projekt stosuje się do [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ---
 
+## [1.4.1] - 2025-11-25
+
+### Naprawiono
+
+- Konflikty skrótów klawiszowych Ctrl+S/Cmd+S w LogsDialog i result page. Gdy LogsDialog był otwarty, skróty działały w obu kontekstach jednocześnie. Teraz skróty działają tylko w kontekście aktywnego komponentu:
+  - Gdy LogsDialog jest otwarty, Ctrl+S/Cmd+S zapisuje logi do pliku.
+  - Gdy LogsDialog jest zamknięty, Ctrl+S/Cmd+S zapisuje wynik operacji.
+
+### Ulepszone
+
+- Ustawiono koniec linii na LF w plikach źródłowych projektu, aby zapewnić spójność między platformami i uniknąć problemów z kompatybilnością.
+
+---
+
 ## [1.4.0] - 2025-11-23
 
 ### Dodano
