@@ -185,12 +185,14 @@ Aplikacja posiada wbudowany system logowania, który rejestruje wszystkie operac
 ### Format logów
 
 Każdy wpis w logu zawiera:
+
 - **Timestamp** – Data i godzina operacji (format: `YYYY-MM-DD HH:MM:SS`)
 - **Poziom** – INFO, WARN lub ERROR
 - **Kontekst** – Moduł, w którym wykonano operację (np. Adapter, Encrypt, Decrypt)
 - **Wiadomość** – Opis wykonanej operacji lub błędu
 
 Przykład wpisu:
+
 ```text
 [2025-11-23 14:30:45] [INFO] [Adapter] Wybrano algorytm szyfrowania: aes-gcm
 [2025-11-23 14:30:46] [ERROR] [Encrypt] Błąd szyfrowania: Invalid key length
