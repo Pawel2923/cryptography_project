@@ -4,7 +4,7 @@ import { Button } from '@renderer/components/ui/button'
 import { TypographyH1 } from '@renderer/components/ui/typography'
 import { useTitle } from '@renderer/hooks/useTitle'
 import { ArrowDownToLine, ExternalLink } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import LogsDialog from '@renderer/components/LogsDialog'
 import { useResult } from '@renderer/hooks/useResult'
 
@@ -12,8 +12,14 @@ export default function ResultPage(): React.ReactNode {
   useTitle('Wynik operacji')
   const { downloadResult, previewResult, clearFile, errorMessage } = useResult()
 
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+
   useEffect(() => {
     const keyDownHandler = (event: KeyboardEvent): void => {
+      if (isDialogOpen) {
+        return
+      }
+
       if (event.key === 's' && (event.ctrlKey || event.metaKey)) {
         event.preventDefault()
         downloadResult()
@@ -30,7 +36,7 @@ export default function ResultPage(): React.ReactNode {
     return (): void => {
       window.removeEventListener('keydown', keyDownHandler)
     }
-  }, [clearFile, downloadResult, previewResult])
+  }, [clearFile, downloadResult, isDialogOpen, previewResult])
 
   return (
     <>
@@ -57,7 +63,7 @@ export default function ResultPage(): React.ReactNode {
             Podgląd
           </Button>
         </div>
-        <LogsDialog />
+        <LogsDialog isOpen={isDialogOpen} setIsOpen={setIsDialogOpen} />
         <Button onClick={clearFile} variant="destructive">
           Powróć do ekranu głównego
         </Button>

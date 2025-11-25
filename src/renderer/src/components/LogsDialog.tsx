@@ -10,9 +10,14 @@ import {
 import { Button } from '@renderer/components/ui/button'
 import { Copy, Download, Check, FileText } from 'lucide-react'
 import { useLogs } from '@renderer/hooks/useLogs'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
-export default function LogsDialog(): React.ReactNode {
+interface LogsDialogProps {
+  isOpen: boolean
+  setIsOpen: (isOpen: boolean) => void
+}
+
+export default function LogsDialog({ isOpen, setIsOpen }: LogsDialogProps): React.ReactNode {
   const {
     logs,
     fetchLogs,
@@ -23,8 +28,6 @@ export default function LogsDialog(): React.ReactNode {
     copyToClipboard,
     saveToFile
   } = useLogs()
-
-  const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
     fetchLogs()
@@ -40,7 +43,7 @@ export default function LogsDialog(): React.ReactNode {
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [fetchLogs])
+  }, [fetchLogs, setIsOpen])
 
   const keyDownHandler = (event: React.KeyboardEvent<HTMLDivElement>): void => {
     if (event.key === 's' && (event.ctrlKey || event.metaKey)) {
