@@ -143,9 +143,11 @@ export default function ECDH(): React.ReactNode {
             <code className="flex-1 p-3 bg-background-primary rounded border border-primary/30 break-all font-mono text-primary">
               {sharedSecret}
             </code>
-            <Button variant="outline" onClick={() => navigator.clipboard.writeText(sharedSecret)}>
-              Kopiuj
-            </Button>
+            <CopyButton
+              valueToCopy={sharedSecret}
+              title="Kopiuj wspólny sekret"
+              className="h-auto"
+            />
           </div>
         </div>
       )}
