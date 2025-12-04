@@ -2,7 +2,7 @@
 
 Aplikacja okienkowa stworzona w technologii **Electron** (z wykorzystaniem **React** i **TypeScript**) do szyfrowania i deszyfrowania tekstu oraz plików tekstowych.
 Projekt stanowi bazę do dalszej rozbudowy o kolejne algorytmy kryptograficzne.
-Zaimplementowane algorytmy: **szyfr Cezara**, **szyfr Vigenere'a**, **szyfr z Kluczem Bieżącym (Running Key Cipher)**, **AES-GCM** oraz **RSA (bez paddingu)**.
+Zaimplementowane algorytmy: **szyfr Cezara**, **szyfr Vigenere'a**, **szyfr z Kluczem Bieżącym (Running Key Cipher)**, **AES-GCM**, **RSA (bez paddingu)** oraz **Wymiana kluczy (ECDH)**.
 
 ---
 
@@ -162,6 +162,25 @@ Do generowania pary kluczy można wykorzystać pomocniczą funkcję `generate_ke
 
 1. **Szyfrowanie** – tekst jawny jest zamieniany na liczbę (`BigUint`) i podnoszony do potęgi `e` modulo `n`. Wynik zapisywany jest do pliku z sufiksem `_encrypted` w formacie hex.
 2. **Deszyfrowanie** – szyfrogram jest wczytywany z pliku, oczyszczany z białych znaków, a następnie potęgowany do `d` modulo `n`. Wynik zapisywany jest do pliku z sufiksem `_decrypted`.
+
+---
+
+## Wymiana kluczy (ECDH)
+
+Implementacja protokołu Diffie-Hellman opartego na krzywych eliptycznych (Elliptic Curve Diffie-Hellman) wykorzystująca krzywą **Curve25519**. Umożliwia dwóm stronom bezpieczne uzgodnienie wspólnego sekretu poprzez niezabezpieczony kanał.
+
+### Cechy implementacji
+
+- **Krzywa**: Curve25519 (bezpieczna, wydajna krzywa eliptyczna, standard de facto w nowoczesnej kryptografii)
+- **Format kluczy**: Base64 (dla łatwego przesyłania i kopiowania w interfejsie)
+- **Biblioteka**: `x25519-dalek` (Rust)
+
+### Przebieg wymiany
+
+1. **Generowanie kluczy**: Użytkownik generuje parę kluczy (prywatny i publiczny) na krzywej Curve25519.
+2. **Wymiana**: Strony wymieniają się kluczami publicznymi (np. przesyłając ciąg Base64 komunikatorem).
+3. **Obliczenie sekretu**: Aplikacja łączy własny klucz prywatny z otrzymanym kluczem publicznym drugiej strony.
+4. **Wspólny sekret**: Wynikiem jest 32-bajtowy sekret (wyświetlany jako Base64), który jest identyczny dla obu stron i może posłużyć jako klucz sesyjny (np. do szyfrowania AES).
 
 ---
 

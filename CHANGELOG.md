@@ -7,6 +7,34 @@ a projekt stosuje się do [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ---
 
+## [1.5.0] - 2025-12-04
+
+### Dodano
+
+#### Frontend (Renderer)
+
+- **Strona Wymiany Kluczy (Key Exchange)**: Nowy widok dedykowany dla protokołu ECDH, umożliwiający generowanie par kluczy oraz obliczanie wspólnego sekretu.
+- **Komponenty UI**:
+  - `CopyButton` – przycisk do kopiowania treści do schowka z wizualnym potwierdzeniem.
+  - `PasteButton` – przycisk do wklejania treści ze schowka do pól tekstowych.
+  - `Sonner` – system powiadomień typu "toast" (z biblioteki shadcn/ui) informujący o sukcesie operacji (np. "Skopiowano do schowka").
+- **Integracja ECDH**: Interfejs do generowania kluczy Curve25519 i wymiany kluczy publicznych w formacie Base64.
+
+#### API (Proces Główny)
+
+- **Nowa przestrzeń nazw `ecdh`**: Rozszerzenie API preload o metody dedykowane dla wymiany kluczy.
+- **Metody API**:
+  - `ecdh.generateKeypair()` – zwraca parę kluczy (publiczny, prywatny) w formacie Base64.
+  - `ecdh.computeSharedSecret(privateKey, publicKey)` – oblicza wspólny sekret na podstawie własnego klucza prywatnego i klucza publicznego drugiej strony.
+
+#### Rust Crypto (Natywny Moduł)
+
+- **Implementacja ECDH**: Obsługa protokołu Elliptic Curve Diffie-Hellman na krzywej **Curve25519**.
+- **Biblioteka `x25519-dalek`**: Wykorzystanie sprawdzonej biblioteki Rust do operacji na krzywych eliptycznych.
+- **Obsługa Base64**: Automatyczna konwersja surowych bajtów kluczy do/z formatu Base64 dla łatwiejszej obsługi w warstwie UI.
+
+---
+
 ## [1.4.1] - 2025-11-25
 
 ### Naprawiono
