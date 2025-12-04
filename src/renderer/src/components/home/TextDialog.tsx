@@ -20,7 +20,8 @@ import { Textarea } from '@renderer/components/ui/textarea'
 import TextContainer from './TextContainer'
 import { DialogDescription } from '@radix-ui/react-dialog'
 import { Button } from '@renderer/components/ui/button'
-import { ClipboardPaste, Trash } from 'lucide-react'
+import { Trash } from 'lucide-react'
+import { PasteButton } from '@renderer/components/PasteButton'
 import { Label } from '@renderer/components/ui/label'
 import { useClipboard } from '@renderer/hooks/useClipboard'
 import { useTextForm } from '@renderer/hooks/useTextForm'
@@ -103,15 +104,11 @@ export default function TextDialog(): React.ReactNode {
                 <FieldTitle className="justify-between">
                   <Label htmlFor="text">Tekst</Label>
                   <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={pasteBtnClickHandler}
-                      aria-label="Wklej tekst ze schowka"
+                    <PasteButton
+                      setPastedValue={handlePaste}
+                      errorHandler={() => handlePaste(null)}
                       title="Wklej ze schowka (Ctrl+V)"
-                    >
-                      <ClipboardPaste aria-hidden="true" />
-                      <span className="sr-only">Wklej ze schowka</span>
-                    </Button>
+                    />
                     <Button
                       type="reset"
                       variant="destructive"

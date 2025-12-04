@@ -13,6 +13,10 @@ export default function HeaderContent(): React.ReactNode {
       <span className="text-text-subtle">/</span>{' '}
       <NavLink to="/decrypt" className={navLinkClasses}>
         Odszyfrowywanie
+      </NavLink>{' '}
+      <span className="text-text-subtle">/</span>{' '}
+      <NavLink to="/key-exchange" className={navLinkClasses}>
+        Wymiana kluczy
       </NavLink>
     </TypographyH1>
   )

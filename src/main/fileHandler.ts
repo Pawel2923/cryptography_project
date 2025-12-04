@@ -10,10 +10,20 @@ const rustCrypto = require('../../rust_crypto/index.node') as {
   encrypt: (filepath: string, key: string, algorithm: string) => string
   decrypt: (filePath: string, key: string, algorithm: string) => string
   generateRsaKeypair: (bits: number) => string
+  generateEcdhKeypair: () => string
+  computeEcdhSharedSecret: (privateKey: string, publicKey: string) => string
   exportLogs: () => string
   clearLogs: () => void
 }
-const { encrypt, decrypt, generateRsaKeypair, exportLogs, clearLogs } = rustCrypto
+const {
+  encrypt,
+  decrypt,
+  generateRsaKeypair,
+  generateEcdhKeypair,
+  computeEcdhSharedSecret,
+  exportLogs,
+  clearLogs
+} = rustCrypto
 
 export function setupFileHandlers(app: Electron.App): void {
   ipcMain.handle(
@@ -262,6 +272,29 @@ export function setupFileHandlers(app: Electron.App): void {
       } catch (error) {
         console.error('Error saving RSA key:', error)
         return err('Nie udało się zapisać klucza RSA')
+      }
+    }
+  )
+
+  ipcMain.handle('ecdh:generateKeypair', async (): Promise<Result<string, string>> => {
+    try {
+      const payload = generateEcdhKeypair()
+      return ok(payload)
+    } catch (error) {
+      console.error('Error generating ECDH keypair:', error)
+      return err('Nie udało się wygenerować pary kluczy ECDH')
+    }
+  })
+
+  ipcMain.handle(
+    'ecdh:computeSharedSecret',
+    async (_event, privateKey: string, publicKey: string): Promise<Result<string, string>> => {
+      try {
+        const secret = computeEcdhSharedSecret(privateKey, publicKey)
+        return ok(secret)
+      } catch (error) {
+        console.error('Error computing ECDH shared secret:', error)
+        return err('Nie udało się obliczyć wspólnego sekretu')
       }
     }
   )

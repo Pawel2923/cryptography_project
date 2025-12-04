@@ -28,6 +28,13 @@ declare global {
         generateKeypair: (bits: number) => Promise<Result<string, string>>
         saveKey: (payload: string, defaultName?: string) => Promise<Result<boolean, string>>
       }
+      ecdh: {
+        generateKeypair: () => Promise<Result<string, string>>
+        computeSharedSecret: (
+          privateKey: string,
+          publicKey: string
+        ) => Promise<Result<string, string>>
+      }
       logs: {
         get: () => Promise<Result<string, string>>
         clear: () => Promise<Result<boolean, string>>

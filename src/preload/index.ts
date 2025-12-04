@@ -19,6 +19,11 @@ const api = {
     saveKey: (payload: string, defaultName?: string) =>
       ipcRenderer.invoke('rsa:saveKey', payload, defaultName)
   },
+  ecdh: {
+    generateKeypair: () => ipcRenderer.invoke('ecdh:generateKeypair'),
+    computeSharedSecret: (privateKey: string, publicKey: string) =>
+      ipcRenderer.invoke('ecdh:computeSharedSecret', privateKey, publicKey)
+  },
   logs: {
     get: () => ipcRenderer.invoke('logs:get'),
     clear: () => ipcRenderer.invoke('logs:clear'),
