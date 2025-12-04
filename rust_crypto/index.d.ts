@@ -2,10 +2,16 @@
 /* eslint-disable */
 export declare function clearLogs(): void
 
+export declare function computeEcdhSharedSecret(privateKey: string, publicKey: string): string
+
 export declare function decrypt(filePath: string, key: string, algorithm: string): string
+
+export declare function deriveEcdhKey(sharedSecret: string, salt?: string | undefined | null, info?: string | undefined | null): string
 
 export declare function encrypt(filePath: string, key: string, algorithm: string): string
 
 export declare function exportLogs(): string
+
+export declare function generateEcdhKeypair(): string
 
 export declare function generateRsaKeypair(bits: number): string

@@ -7,6 +7,7 @@ mod error;
 mod traits;
 mod utils;
 use adapter::AlgorithmAdapter;
+use base64::Engine;
 
 use crate::utils::logger;
 
@@ -77,4 +78,62 @@ pub fn export_logs() -> napi::Result<String> {
 #[napi]
 pub fn clear_logs() {
     logger::clear_logs();
+}
+
+#[napi]
+pub fn generate_ecdh_keypair() -> napi::Result<String> {
+    let (private, public) = algorithms::ecdh::PrivateKey::generate();
+    let payload = json!({
+        "private": private.to_base64(),
+        "public": public.to_base64()
+    });
+    Ok(payload.to_string())
+}
+
+#[napi]
+pub fn compute_ecdh_shared_secret(private_key: String, public_key: String) -> napi::Result<String> {
+    let private = algorithms::ecdh::PrivateKey::from_base64(&private_key)
+        .map_err(|e| napi::Error::from_reason(e.to_string()))?;
+    let public = algorithms::ecdh::PublicKeyBytes::from_base64(&public_key)
+        .map_err(|e| napi::Error::from_reason(e.to_string()))?;
+
+    let shared_secret = private.compute_shared_secret(&public)
+        .map_err(|e| napi::Error::from_reason(e.to_string()))?;
+
+    Ok(base64::engine::general_purpose::STANDARD.encode(shared_secret))
+}
+
+#[napi]
+pub fn derive_ecdh_key(
+    shared_secret: String,
+    salt: Option<String>,
+    info: Option<String>,
+) -> napi::Result<String> {
+    let secret_bytes = base64::engine::general_purpose::STANDARD
+        .decode(&shared_secret)
+        .map_err(|_| napi::Error::from_reason("Invalid base64 shared secret".to_string()))?;
+
+    let salt_bytes = if let Some(s) = salt {
+        Some(base64::engine::general_purpose::STANDARD
+            .decode(&s)
+            .map_err(|_| napi::Error::from_reason("Invalid base64 salt".to_string()))?)
+    } else {
+        None
+    };
+
+    let info_bytes = if let Some(i) = info {
+        Some(base64::engine::general_purpose::STANDARD
+            .decode(&i)
+            .map_err(|_| napi::Error::from_reason("Invalid base64 info".to_string()))?)
+    } else {
+        None
+    };
+
+    let derived = algorithms::ecdh::PrivateKey::derive_key(
+        &secret_bytes,
+        salt_bytes.as_deref(),
+        info_bytes.as_deref(),
+    ).map_err(|e| napi::Error::from_reason(e.to_string()))?;
+
+    Ok(base64::engine::general_purpose::STANDARD.encode(derived))
 }
