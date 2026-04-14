@@ -7,6 +7,24 @@ a projekt stosuje się do [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ---
 
+## [1.5.1] - 2026-04-14
+
+## Zaktualizowano
+
+- Pakiet `electron` do wersji 41.2.0
+- Pakiet `electron-builder` do wersji 26.8.1
+- Pakiet `electron-vite` do wersji 5.0.0
+- Pakiet `vite` do wersji 7.3.2
+- Pakiet '@tailwindcss/vite' do wersji 4.2.2
+
+## Usunięto
+
+- Plik `.npmrc`
+- Plik `pnpm-lock.yaml`
+- Konfigurację dla `pnpm` w `package.json`
+
+---
+
 ## [1.5.0] - 2025-12-04
 
 ### Dodano
