@@ -4,6 +4,8 @@ Aplikacja okienkowa stworzona w technologii **Electron** (z wykorzystaniem **Rea
 Projekt stanowi bazę do dalszej rozbudowy o kolejne algorytmy kryptograficzne.
 Zaimplementowane algorytmy: **szyfr Cezara**, **szyfr Vigenere'a**, **szyfr z Kluczem Bieżącym (Running Key Cipher)**, **AES-GCM**, **RSA (bez paddingu)** oraz **Wymiana kluczy (ECDH)**.
 
+> Uwaga: projekt został przygotowany na potrzeby zaliczenia i nie jest już dalej rozwijany ani aktualizowany.
+
 ---
 
 ## Opis projektu
