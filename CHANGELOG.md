@@ -7,6 +7,28 @@ a projekt stosuje się do [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ---
 
+## [1.5.2] - 2026-08-15
+
+### Zmieniono
+
+#### Rust Crypto (Natywny Moduł)
+
+- **Refaktoryzacja architektury serwisów kryptograficznych**: Zastąpiono statyczny moduł `AlgorithmAdapter` elastycznym rejestrem `CryptoService` (`rust_crypto/src/crypto_service.rs`):
+  - Wprowadzono dynamiczny, bezpieczny wielowątkowo rejestr algorytmów (`Lazy<RwLock<HashMap<...>>>`) oparty na konstruktorach fabrycznych.
+  - Dodano metody `register_algorithm` do dynamicznej rejestracji nowych algorytmów oraz `registered_algorithms` do pobierania listy dostępnych algorytmów.
+  - Ujednolicono interfejs tworzenia instancji algorytmów za pomocą `create_cipher`.
+  - Dodano zestaw testów jednostkowych weryfikujących rejestrację, tworzenie domyślnych i niestandardowych algorytmów oraz obsługę nieznanych algorytmów.
+  - Zaktualizowano powiązania N-API w `lib.rs` oraz punkt wejścia w `main.rs` do korzystania z `CryptoService`.
+
+### Zaktualizowano
+
+- Pakiet `@napi-rs/cli` w `rust_crypto` do wersji `^3.8.6`
+- Zaktualizowano zależności projektu w plikach lock
+- Dodano sekcję `allowScripts` w `package.json` dla zaufanych skryptów instalacyjnych (`electron`, `electron-winstaller`, `esbuild`)
+- Przebudowano moduł natywny `rust_crypto/index.node`
+
+---
+
 ## [1.5.1] - 2026-04-14
 
 ## Zaktualizowano

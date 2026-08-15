@@ -1,19 +1,19 @@
 use napi_derive::napi;
 use serde_json::json;
 
-mod adapter;
 mod algorithms;
+mod crypto_service;
 mod error;
 mod traits;
 mod utils;
-use adapter::AlgorithmAdapter;
 use base64::Engine;
+use crypto_service::CryptoService;
 
 use crate::utils::logger;
 
 #[napi]
 pub fn encrypt(file_path: String, key: String, algorithm: String) -> napi::Result<String> {
-    match AlgorithmAdapter::encrypt(file_path, key, algorithm) {
+    match CryptoService::encrypt(&file_path, &key, &algorithm) {
         Ok(result) => Ok(result),
         Err(e) => {
             logger::log(
@@ -28,7 +28,7 @@ pub fn encrypt(file_path: String, key: String, algorithm: String) -> napi::Resul
 
 #[napi]
 pub fn decrypt(file_path: String, key: String, algorithm: String) -> napi::Result<String> {
-    match AlgorithmAdapter::decrypt(file_path, key, algorithm) {
+    match CryptoService::decrypt(&file_path, &key, &algorithm) {
         Ok(result) => Ok(result),
         Err(e) => {
             logger::log(
